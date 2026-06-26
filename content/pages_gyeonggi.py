@@ -169,7 +169,7 @@ def main_page():
     hero = """<div class="hero">
   <div class="hero-content">
     <div class="hero-badge">경기 전지역 방문 관리</div>
-    <h1 class="hero-title">경기 출장마사지<br><span class="hero-accent">경기 홈타이</span><br>주요 생활권 안내</h1>
+    <h1 class="hero-title">경기 출장마사지·<span class="hero-accent">홈타이</span><br>주요 생활권 안내</h1>
     <p class="hero-lead">수원, 분당, 용인, 일산, 부천, 안산, 안양, 동탄, 평택, 김포, 의정부 등 경기 주요 생활권별 방문 가능 지역과 예약 전 확인사항을 안내합니다.</p>
     <div class="hero-cta">
       <a href="#zones" class="btn btn-primary">권역별 보기</a>
@@ -247,7 +247,7 @@ def main_page():
         "path": "gyeonggi/",
         "title": "경기 출장마사지｜수원·분당·용인·부천·일산 홈타이 안내",
         "desc": "경기 출장마사지·홈타이 예약 전 수원, 분당, 용인, 부천, 일산, 동탄 생활권을 확인하세요.",
-        "h1": "경기 출장마사지 · 경기 주요 생활권 홈타이 안내",
+        "h1": "경기 출장마사지·홈타이 · 주요 생활권 안내",
         "hero": hero,
         "breadcrumb": [],
         "extra_head": _faq_schema(faq),
@@ -315,7 +315,7 @@ def zone_page(zone):
         "path": f"gyeonggi/zone/{zone['key']}/",
         "title": zone["title"],
         "desc": zone["desc"],
-        "h1": f"{zone['name']} 출장마사지 · 권역별 생활권 안내",
+        "h1": f"{zone['name']} 출장마사지·홈타이 권역별 생활권 안내",
         "breadcrumb": [("경기", "/gyeonggi/"), ("권역별 안내", ""), (zone["name"], "")],
         "body": body,
     }
@@ -422,7 +422,7 @@ def city_page(c):
         "path": f"gyeonggi/{c['slug']}/",
         "title": c["title"],
         "desc": c["desc"],
-        "h1": f"{c['name']} 출장마사지 · 생활권별 예약 안내",
+        "h1": f"{c['name']} 출장마사지·홈타이 생활권별 예약 안내",
         "breadcrumb": [("경기", "/gyeonggi/"),
                         (zone["name"], f"/gyeonggi/zone/{zone['key']}/"),
                         (c["name"], "")],
@@ -503,7 +503,7 @@ def gu_page(g):
         "path": f"gyeonggi/{g['city']}/{g['slug']}/",
         "title": f"{g['city_name']} {g['gu']} 출장마사지·홈타이 생활권 안내",
         "desc": f"{g['city_name']} {g['gu']} 출장마사지·홈타이 — {' · '.join([d for d, _ in g['dong'][:3]])} 생활권 안내.",
-        "h1": f"{g['city_name']} {g['gu']} 출장마사지 · 생활권 안내",
+        "h1": f"{g['city_name']} {g['gu']} 출장마사지·홈타이 생활권 안내",
         "breadcrumb": [("경기", "/gyeonggi/"),
                         (g["city_name"], f"/gyeonggi/{g['city']}/"),
                         (g["gu"], "")],
@@ -578,7 +578,7 @@ def life_page(l):
         "path": f"gyeonggi/life/{l['slug']}/",
         "title": f"{l['name']} 출장마사지·홈타이 생활권 안내",
         "desc": f"{l['name']} 출장마사지·홈타이 — {l['city_name']} {' · '.join(l['dong'][:2])} 생활권 예약 안내.",
-        "h1": f"{l['name']} 출장마사지 · 생활권 예약 안내",
+        "h1": f"{l['name']} 출장마사지·홈타이 생활권 예약 안내",
         "breadcrumb": [("경기", "/gyeonggi/"),
                         (l["city_name"], f"/gyeonggi/{l['city']}/"),
                         (l["name"], "")],
@@ -671,7 +671,7 @@ def station_page(s):
         "path": f"gyeonggi/station/{s['slug']}/",
         "title": f"{s['name']} 출장마사지·홈타이 역세권 안내",
         "desc": f"{s['name']} 출장마사지·홈타이 — {s['city_name']} {' · '.join(s['areas'][:2])} 인근 생활권 안내.",
-        "h1": f"{s['name']} 출장마사지 · 역세권 예약 안내",
+        "h1": f"{s['name']} 출장마사지·홈타이 역세권 예약 안내",
         "breadcrumb": [("경기", "/gyeonggi/"),
                         (s["city_name"], f"/gyeonggi/{s['city']}/"),
                         (s["name"], "")],
@@ -749,7 +749,7 @@ def dong_page(d):
         "path": path,
         "title": f"{d['city_name']} {d['name']} 출장마사지·홈타이 안내",
         "desc": f"{d['city_name']} {d['name']} 출장마사지·홈타이 — {adj} 인근 생활권 예약 안내."[:79],
-        "h1": f"{d['city_name']} {d['name']} 출장마사지 · 생활권 안내",
+        "h1": f"{d['city_name']} {d['name']} 출장마사지·홈타이 생활권 안내",
         "breadcrumb": crumb,
         "extra_head": _faq_schema(faq),
         "body": body,
