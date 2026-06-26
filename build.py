@@ -142,7 +142,7 @@ def render_pricing() -> str:
         f'<p class="pricing-note">{PRICING_NOTE}</p>'
         f'<div class="price-grid">{"".join(cards)}</div>'
         f'<p class="pricing-foot">{PRICING_FOOT} '
-        '<a href="/gyeonggi/reservation/">요금·예약 기준 자세히 보기 →</a></p>'
+        '<a href="/reservation/">요금·예약 기준 자세히 보기 →</a></p>'
         '</div></section>'
     )
 
@@ -345,11 +345,15 @@ def render_page(page: dict) -> str:
 <meta property="og:description" content="{desc}">
 <meta property="og:url" content="{canonical}">
 <meta property="og:site_name" content="{BRAND}">
-<meta property="og:image" content="{BASE_URL.rstrip('/')}/assets/og-image.png">
+<meta property="og:image" content="{BASE_URL.rstrip('/')}/assets/og-image.png?v=3">
+<meta property="og:image:secure_url" content="{BASE_URL.rstrip('/')}/assets/og-image.png?v=3">
+<meta property="og:image:type" content="image/png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="{BRAND} 경기 출장마사지·홈타이 24시간 방문 예약">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="{BASE_URL.rstrip('/')}/assets/og-image.png">
+<meta name="twitter:image" content="{BASE_URL.rstrip('/')}/assets/og-image.png?v=3">
+<meta name="twitter:image:alt" content="{BRAND} 경기 출장마사지·홈타이 방문 예약">
 <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg?v=2">
 <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png?v=2">
 <link rel="icon" href="/favicon.ico?v=2" sizes="48x48">
@@ -366,7 +370,7 @@ def render_page(page: dict) -> str:
   <div class="header-accent" aria-hidden="true"></div>
   <div class="header-top">
     <div class="header-inner">
-      <a class="brand" href="/gyeonggi/"><span class="brand-mark">{BRAND_MARK}</span> <span class="brand-text">{BRAND}</span></a>
+      <a class="brand" href="/"><span class="brand-mark">{BRAND_MARK}</span> <span class="brand-text">{BRAND}</span></a>
       <p class="header-tagline"><span class="tag-gem">◆</span> {TAGLINE} <span class="tag-gem">◆</span> 24시간 상담</p>
       <a class="header-call" href="tel:{PHONE}"><span class="call-label">예약전화</span> {PHONE_DISPLAY}</a>
       <button class="nav-toggle" aria-label="메뉴 열기" aria-expanded="false"><span></span><span></span><span></span></button>
@@ -402,25 +406,25 @@ def render_page(page: dict) -> str:
     <nav class="footer-col" aria-label="권역·시군 안내">
       <p class="footer-title">권역·시군</p>
       <ul>
-        <li><a href="/gyeonggi/">경기 출장마사지·홈타이 생활권 안내</a></li>
-        <li><a href="/gyeonggi/zone/south/">경기남부 수원·분당·동탄 생활권</a></li>
-        <li><a href="/gyeonggi/zone/north/">경기북부 일산·의정부·다산 생활권</a></li>
-        <li><a href="/gyeonggi/zone/west/">경기서부 부천·안산·김포 생활권</a></li>
-        <li><a href="/gyeonggi/suwon/">수원 출장마사지 생활권 안내</a></li>
+        <li><a href="/">경기 출장마사지·홈타이 생활권 안내</a></li>
+        <li><a href="/zone/south/">경기남부 수원·분당·동탄 생활권</a></li>
+        <li><a href="/zone/north/">경기북부 일산·의정부·다산 생활권</a></li>
+        <li><a href="/zone/west/">경기서부 부천·안산·김포 생활권</a></li>
+        <li><a href="/suwon/">수원 출장마사지 생활권 안내</a></li>
       </ul>
     </nav>
     <nav class="footer-col" aria-label="이용 안내">
       <p class="footer-title">이용 안내</p>
       <ul>
-        <li><a href="/gyeonggi/reservation/">예약안내</a></li>
-        <li><a href="/gyeonggi/check/">이용 전 확인사항</a></li>
-        <li><a href="/gyeonggi/support/">고객센터</a></li>
+        <li><a href="/reservation/">예약안내</a></li>
+        <li><a href="/check/">이용 전 확인사항</a></li>
+        <li><a href="/support/">고객센터</a></li>
       </ul>
     </nav>
     <nav class="footer-col" aria-label="정책 및 기준">
       <p class="footer-title">정책·기관 안내</p>
       <ul>
-        <li><a href="/gyeonggi/privacy/">개인정보처리방침</a></li>
+        <li><a href="/privacy/">개인정보처리방침</a></li>
         <li><a href="https://www.gg.go.kr/" target="_blank" rel="noopener">경기도청 공식 홈페이지</a></li>
         <li><a href="https://www.pipc.go.kr/" target="_blank" rel="noopener">개인정보보호위원회</a></li>
         <li><a href="https://t.me/googleseolab" target="_blank" rel="noopener nofollow">문의하기</a></li>
@@ -438,9 +442,9 @@ def render_page(page: dict) -> str:
     </div>
   </div>
 </footer>
-<a class="call-fab" href="tel:{PHONE}" aria-label="전화 예약 {PHONE_DISPLAY}">
+<a class="call-fab" href="tel:{PHONE}" aria-label="예약 전화 {PHONE_DISPLAY}">
   <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
-  <span class="call-fab-label">예약 전화</span>
+  <span class="call-fab-text">예약전화</span>
 </a>
 <script src="/assets/nav.js"></script>
 </body>

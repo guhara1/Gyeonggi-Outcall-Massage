@@ -10,7 +10,7 @@
 
 - **정적 HTML 사이트** — GitHub Pages·Netlify·Cloudflare Pages 등 어디서나 그대로 서빙
 - **build.py** + **content/** — 페이지를 Python 데이터로 정의하고 정적 HTML 생성
-- 생성물은 저장소 루트에 직접 출력됩니다 (`/gyeonggi/...`)
+- 생성물은 저장소 루트에 직접 출력됩니다 (`/...`)
 
 ```
 build.py                     # 빌드 스크립트 (템플릿·스키마·sitemap·robots)
@@ -28,16 +28,16 @@ assets/
 
 | 페이지 | URL | 수 |
 |---|---|---|
-| 루트 | `/` → `/gyeonggi/` 리다이렉트 | 1 |
-| 경기 메인 | `/gyeonggi/` | 1 |
-| 권역 | `/gyeonggi/zone/{south,north,west,east,outer-area}/` | 5 |
-| 시군 | `/gyeonggi/{slug}/` (예: `/gyeonggi/suwon/`) | 31 |
-| 일반구 | `/gyeonggi/{city}/{gu}/` (예: `/gyeonggi/suwon/paldal-gu/`) | 20 |
-| 생활권 | `/gyeonggi/life/{slug}/` (예: `/gyeonggi/life/bundang-pangyo/`) | 25 |
-| 역세권 | `/gyeonggi/station/{slug}/` (예: `/gyeonggi/station/suwon-station/`) | 55 |
-| 읍면동 | `/gyeonggi/{city}/({gu}/){dong}/` | 336 |
-| 이용 목적별 | `/gyeonggi/purpose/{home,lodging,officetel,business,outer,travel-fee}/` | 6 |
-| 정보 | `/gyeonggi/{reservation,check,privacy,support}/` | 4 |
+| 루트 | `/` → `/` 리다이렉트 | 1 |
+| 경기 메인 | `/` | 1 |
+| 권역 | `/zone/{south,north,west,east,outer-area}/` | 5 |
+| 시군 | `/{slug}/` (예: `/suwon/`) | 31 |
+| 일반구 | `/{city}/{gu}/` (예: `/suwon/paldal-gu/`) | 20 |
+| 생활권 | `/life/{slug}/` (예: `/life/bundang-pangyo/`) | 25 |
+| 역세권 | `/station/{slug}/` (예: `/station/suwon-station/`) | 55 |
+| 읍면동 | `/{city}/({gu}/){dong}/` | 336 |
+| 이용 목적별 | `/purpose/{home,lodging,officetel,business,outer,travel-fee}/` | 6 |
+| 정보 | `/{reservation,check,privacy,support}/` | 4 |
 
 전체 484페이지. 색인(index) 479페이지(읍면동 본문 2,000~2,500자).
 **클릭 동선 완결**: 일반구가 있는 시는 시→구→행정동 전체, 일반구가 없는 시는 시→행정동 전체가

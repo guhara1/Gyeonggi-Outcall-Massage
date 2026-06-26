@@ -7,13 +7,13 @@ from .site import BRAND, PHONE
 def _page(path, title, desc, h1, crumb_last, body):
     return {
         "path": path, "title": title, "desc": desc, "h1": h1,
-        "breadcrumb": [("경기", "/gyeonggi/"), (crumb_last, "")],
+        "breadcrumb": [("경기", "/"), (crumb_last, "")],
         "body": body,
     }
 
 
 reservation = _page(
-    "gyeonggi/reservation/",
+    "reservation/",
     "예약 안내｜경기 출장마사지·홈타이 예약 방법",
     "경기 출장마사지·홈타이 예약 방법, 준비 정보, 취소 기준, 결제 방식을 안내합니다.",
     "경기 출장마사지 예약 안내", "예약 안내",
@@ -62,14 +62,14 @@ reservation = _page(
 
 <section>
   <h2>안전한 이용을 위해</h2>
-  <p>{BRAND}는 <a href="/gyeonggi/check/">이용 전 확인사항</a>을 먼저 읽으신 후 예약하시기를 권장합니다. 권역별 안내는 <a href="/gyeonggi/">경기 메인</a>에서 확인하실 수 있습니다.</p>
+  <p>{BRAND}는 <a href="/check/">이용 전 확인사항</a>을 먼저 읽으신 후 예약하시기를 권장합니다. 권역별 안내는 <a href="/">경기 메인</a>에서 확인하실 수 있습니다.</p>
 </section>
 """,
 )
 
 
 check = _page(
-    "gyeonggi/check/",
+    "check/",
     "이용 전 확인사항｜경기 출장마사지·홈타이 안전 가이드",
     "경기 출장마사지·홈타이 이용 전 반드시 확인할 안전·예약·이동 기준을 안내합니다.",
     "경기 출장마사지 이용 전 확인사항", "이용 전 확인사항",
@@ -97,7 +97,7 @@ check = _page(
 
 <section>
   <h2>개인정보 처리 기준</h2>
-  <p>예약을 위해 수집한 연락처·주소 등 개인정보는 예약 진행 목적에 한해 사용하며, 목적 달성 후에는 안전하게 파기합니다. 자세한 내용은 <a href="/gyeonggi/privacy/">개인정보처리방침</a>을 확인하세요.</p>
+  <p>예약을 위해 수집한 연락처·주소 등 개인정보는 예약 진행 목적에 한해 사용하며, 목적 달성 후에는 안전하게 파기합니다. 자세한 내용은 <a href="/privacy/">개인정보처리방침</a>을 확인하세요.</p>
 </section>
 
 <section>
@@ -109,7 +109,7 @@ check = _page(
 
 
 privacy = _page(
-    "gyeonggi/privacy/",
+    "privacy/",
     "개인정보처리방침｜경기 출장마사지 간다GO",
     "간다GO 경기 출장마사지 개인정보 수집·이용·보관·파기 기준을 안내합니다.",
     "개인정보처리방침", "개인정보처리방침",
@@ -135,14 +135,14 @@ privacy = _page(
 
 <section>
   <h2>이용자 권리</h2>
-  <p>고객은 언제든지 본인의 개인정보 열람·정정·삭제를 요청할 수 있으며, 요청 시 지체 없이 처리합니다. 문의는 <a href="/gyeonggi/support/">고객센터</a> 또는 <a href="tel:{PHONE}">{PHONE}</a>로 연락 주시기 바랍니다.</p>
+  <p>고객은 언제든지 본인의 개인정보 열람·정정·삭제를 요청할 수 있으며, 요청 시 지체 없이 처리합니다. 문의는 <a href="/support/">고객센터</a> 또는 <a href="tel:{PHONE}">{PHONE}</a>로 연락 주시기 바랍니다.</p>
 </section>
 """,
 )
 
 
 support = _page(
-    "gyeonggi/support/",
+    "support/",
     "고객센터｜경기 출장마사지 간다GO 문의",
     "간다GO 경기 출장마사지 고객센터 연락처, 상담 시간, 제휴·문의 안내입니다.",
     "고객센터", "고객센터",
@@ -160,7 +160,7 @@ support = _page(
 
 <section>
   <h2>지역 안내가 필요하신가요?</h2>
-  <p>방문 지역이 어느 생활권에 속하는지 모르실 때는 <a href="/gyeonggi/">경기 메인</a>에서 권역과 시군을 확인하시거나, 전화 상담으로 가까운 생활권을 안내받으실 수 있습니다.</p>
+  <p>방문 지역이 어느 생활권에 속하는지 모르실 때는 <a href="/">경기 메인</a>에서 권역과 시군을 확인하시거나, 전화 상담으로 가까운 생활권을 안내받으실 수 있습니다.</p>
 </section>
 
 <section>

@@ -2,10 +2,10 @@
 """경기 출장마사지 — 페이지 생성기.
 
 gyeonggi_data 의 구조화 데이터를 받아 페이지 dict 를 생성한다.
-  - 루트 리다이렉트 (/)  → /gyeonggi/
-  - 경기 메인 (/gyeonggi/)
-  - 권역 페이지 (/gyeonggi/zone/<key>/)  5개
-  - 시군 페이지 (/gyeonggi/<slug>/)       31개
+  - 루트 리다이렉트 (/)  → /
+  - 경기 메인 (/)
+  - 권역 페이지 (/zone/<key>/)  5개
+  - 시군 페이지 (/<slug>/)       31개
 스키마(Organization/WebPage/BreadcrumbList)는 build.py 가 자동 주입하고,
 시군 페이지에는 FAQPage 스키마를 extra_head 로 추가한다.
 """
@@ -32,7 +32,7 @@ def _dong_url(city, name):
     if not ref:
         return None
     gu, slug = ref
-    return f"/gyeonggi/{city}/{gu}/{slug}/" if gu else f"/gyeonggi/{city}/{slug}/"
+    return f"/{city}/{gu}/{slug}/" if gu else f"/{city}/{slug}/"
 
 
 def _dongs_of_gu(city, gu):
@@ -53,7 +53,7 @@ def _station_links(names):
     out = []
     for n in names:
         slug = _STATION_SLUG_BY_NAME.get(n)
-        out.append(f'<a href="/gyeonggi/station/{slug}/">{n}</a>' if slug else n)
+        out.append(f'<a href="/station/{slug}/">{n}</a>' if slug else n)
     return " · ".join(out)
 
 
@@ -65,7 +65,7 @@ _PURPOSE = [
 
 
 def _purpose_links():
-    return _li_links([(f"{n} 이용 안내", f"/gyeonggi/purpose/{s}/") for n, s in _PURPOSE])
+    return _li_links([(f"{n} 이용 안내", f"/purpose/{s}/") for n, s in _PURPOSE])
 
 
 # E-E-A-T 신호: 작성·검수 바이라인 + 연락처(YMYL 신뢰 신호).
@@ -77,8 +77,8 @@ _BYLINE = (
     '바탕으로 주기적으로 갱신합니다.</p>'
     f'<p><strong>운영</strong> {BRAND} 편집팀 · <strong>예약·문의</strong> '
     f'<a href="tel:{PHONE}">{PHONE}</a> (연중무휴 24시간) · '
-    '<strong>회사 안내</strong> <a href="/gyeonggi/support/">고객센터</a> · '
-    '<strong>개인정보</strong> <a href="/gyeonggi/privacy/">처리방침</a></p>'
+    '<strong>회사 안내</strong> <a href="/support/">고객센터</a> · '
+    '<strong>개인정보</strong> <a href="/privacy/">처리방침</a></p>'
     '</section>'
 )
 
@@ -157,7 +157,7 @@ _CHECK_BLOCK = """
     <li><strong>개인정보 처리 기준</strong> — 개인정보 수집·이용·보관 방식</li>
     <li><strong>불법·선정적 서비스 불가 안내</strong> — 건전한 방문 관리 서비스만 제공</li>
   </ul>
-  <p>자세한 내용은 <a href="/gyeonggi/reservation/">예약 안내</a>와 <a href="/gyeonggi/check/">이용 전 확인사항</a>에서 확인하세요.</p>
+  <p>자세한 내용은 <a href="/reservation/">예약 안내</a>와 <a href="/check/">이용 전 확인사항</a>에서 확인하세요.</p>
 </section>"""
 
 
@@ -170,22 +170,22 @@ def root_redirect_page():
         "h1": "경기 출장마사지",
         "breadcrumb": [],
         "noindex": True,
-        "extra_head": '<meta http-equiv="refresh" content="0;url=/gyeonggi/">',
+        "extra_head": '<meta http-equiv="refresh" content="0;url=/">',
         "body": ('<p>경기 출장마사지·홈타이 안내 페이지로 이동합니다. 자동으로 이동하지 않으면 '
-                 '<a href="/gyeonggi/">여기를 클릭</a>하세요.</p>'),
+                 '<a href="/">여기를 클릭</a>하세요.</p>'),
     }
 
 
 # ── 경기 메인 ───────────────────────────────────────────────
 def main_page():
     zone_cards = _cards([
-        (z["name"], z["focus"].split(". ")[0] + ".", f'/gyeonggi/zone/{z["key"]}/')
+        (z["name"], z["focus"].split(". ")[0] + ".", f'/zone/{z["key"]}/')
         for z in ZONES
     ])
 
     # 시군 카드 — 31개 전부 내부링크
     city_cells = "".join(
-        f'<a href="/gyeonggi/{c["slug"]}/" class="card"><h3>{c["name"]}</h3>'
+        f'<a href="/{c["slug"]}/" class="card"><h3>{c["name"]}</h3>'
         f'<p>{" · ".join(c["life"][:2]) if c["life"] else "차량 이동 기준 안내"}</p></a>'
         for c in CITIES
     )
@@ -194,7 +194,7 @@ def main_page():
     # 핵심 생활권 카드 — 25개 생활권 허브로 직접 연결
     life_grid = _cards([
         (l["name"], f"{l['city_name']} {l['name']} 생활권 · 출장마사지 예약 기준",
-         f"/gyeonggi/life/{l['slug']}/")
+         f"/life/{l['slug']}/")
         for l in LIFE
     ])
 
@@ -220,7 +220,7 @@ def main_page():
       <a href="#zones" class="btn btn-primary">권역별 보기</a>
       <a href="#cities" class="btn btn-secondary">시군 찾기</a>
       <a href="#life" class="btn btn-secondary">생활권 찾기</a>
-      <a href="/gyeonggi/reservation/" class="btn btn-secondary">예약 안내 보기</a>
+      <a href="/reservation/" class="btn btn-secondary">예약 안내 보기</a>
     </div>
   </div>
   <div class="hero-stats">
@@ -257,21 +257,21 @@ def main_page():
 </section>
 
 <section id="popular">
-  <h2>경기 인기 검색 지역 바로가기</h2>
-  <p>경기에서 방문 예약이 많은 생활권·역세권입니다. 찾으시는 지역을 바로 확인하세요.</p>
-  <ul class="dong-list">
-    <li><a href="/gyeonggi/station/suwon-station/">수원역 출장마사지 홈타이 방문예약</a></li>
-    <li><a href="/gyeonggi/life/bundang-pangyo/">분당·판교 출장마사지 홈타이 예약</a></li>
-    <li><a href="/gyeonggi/life/dongtan-newtown/">동탄신도시 출장마사지 홈타이</a></li>
-    <li><a href="/gyeonggi/life/ilsan-kintex/">일산 킨텍스 출장마사지 홈타이</a></li>
-    <li><a href="/gyeonggi/life/bucheon-station-sangdong/">부천역·상동 출장마사지 홈타이</a></li>
-    <li><a href="/gyeonggi/life/ansan-jungang-choji/">안산중앙·초지 출장마사지 홈타이</a></li>
-    <li><a href="/gyeonggi/life/anyang-beomgye-pyeongchon/">범계·평촌 출장마사지 홈타이</a></li>
-    <li><a href="/gyeonggi/life/hanam-misa/">하남 미사 출장마사지 홈타이</a></li>
-    <li><a href="/gyeonggi/life/gimpo-gurae/">김포 구래 출장마사지 홈타이</a></li>
-    <li><a href="/gyeonggi/life/uijeongbu-station-minrak/">의정부역·민락 출장마사지 홈타이</a></li>
-    <li><a href="/gyeonggi/life/gwangmyeong-cheolsan/">광명 철산 출장마사지 홈타이</a></li>
-    <li><a href="/gyeonggi/station/jeongja-station/">정자역 출장마사지 홈타이 방문예약</a></li>
+  <h2>경기에서 방문 문의가 많은 생활권</h2>
+  <p>상권·업무·숙소가 밀집한 생활권일수록 방문 문의가 꾸준합니다. 아래 지역은 특히 예약 문의가 많아 따로 정리했습니다.</p>
+  <ul>
+    <li><a href="/station/suwon-station/">수원역·인계동</a> 일대는 상권과 숙소가 밀집해 방문 문의가 가장 많은 생활권입니다.</li>
+    <li><a href="/life/bundang-pangyo/">분당·판교</a>는 업무지구와 주거지가 함께 있어 평일·주말 모두 문의가 이어집니다.</li>
+    <li><a href="/life/dongtan-newtown/">동탄신도시</a>는 대단지 주거가 많아 자택 방문 예약이 활발한 신도시입니다.</li>
+    <li><a href="/life/ilsan-kintex/">일산 킨텍스</a>는 전시·행사 시즌에 인근 숙소 방문 문의가 늘어나는 지역입니다.</li>
+    <li><a href="/life/bucheon-station-sangdong/">부천역·상동</a>은 역세권 상권이 촘촘해 오피스텔·숙소 방문이 많습니다.</li>
+    <li><a href="/life/ansan-jungang-choji/">안산 중앙·초지</a>는 도심 상권과 신도시 주거가 어우러진 생활권입니다.</li>
+    <li><a href="/life/anyang-beomgye-pyeongchon/">안양 범계·평촌</a>은 학원가·업무권이 모여 저녁 시간대 문의가 많은 편입니다.</li>
+    <li><a href="/life/hanam-misa/">하남 미사</a>는 미사강변도시 대단지를 중심으로 자택 방문 예약이 꾸준합니다.</li>
+    <li><a href="/life/gimpo-gurae/">김포 구래</a>는 한강신도시 주거권으로 신도시 단지 방문 문의가 이어집니다.</li>
+    <li><a href="/life/uijeongbu-station-minrak/">의정부역·민락</a>은 도심 상권과 민락2지구 주거가 함께 있는 생활권입니다.</li>
+    <li><a href="/life/gwangmyeong-cheolsan/">광명 철산</a>은 서울과 가까운 도심 상권으로 접근성 문의가 많습니다.</li>
+    <li><a href="/station/jeongja-station/">정자역</a> 주변은 카페거리와 업무 빌딩이 모인 분당 정자동 생활권입니다.</li>
   </ul>
 </section>
 
@@ -279,12 +279,12 @@ def main_page():
   <h2>이용 목적별 안내</h2>
   <p>방문 장소와 목적에 따라 확인할 점이 다릅니다. 자택·숙소·오피스텔·업무지구·외곽 방문과 추가 이동비 기준을 안내합니다.</p>
   {_cards([
-    ("자택 이용 안내", "자택 방문 시 주소·출입·준비 사항", "/gyeonggi/purpose/home/"),
-    ("호텔·숙소 이용 안내", "호텔·펜션 방문 시 건물명·객실 안내", "/gyeonggi/purpose/lodging/"),
-    ("오피스텔 이용 안내", "오피스텔 공동현관·호수 출입 안내", "/gyeonggi/purpose/officetel/"),
-    ("업무지구 예약 안내", "판교·광교·동탄 업무지구 출입 안내", "/gyeonggi/purpose/business/"),
-    ("외곽 지역 이용 안내", "가평·연천·포천 등 차량 이동 기준", "/gyeonggi/purpose/outer/"),
-    ("추가 이동비 안내", "기본 이동권과 추가 이동비 기준", "/gyeonggi/purpose/travel-fee/"),
+    ("자택 이용 안내", "자택 방문 시 주소·출입·준비 사항", "/purpose/home/"),
+    ("호텔·숙소 이용 안내", "호텔·펜션 방문 시 건물명·객실 안내", "/purpose/lodging/"),
+    ("오피스텔 이용 안내", "오피스텔 공동현관·호수 출입 안내", "/purpose/officetel/"),
+    ("업무지구 예약 안내", "판교·광교·동탄 업무지구 출입 안내", "/purpose/business/"),
+    ("외곽 지역 이용 안내", "가평·연천·포천 등 차량 이동 기준", "/purpose/outer/"),
+    ("추가 이동비 안내", "기본 이동권과 추가 이동비 기준", "/purpose/travel-fee/"),
   ])}
 </section>
 
@@ -308,7 +308,7 @@ def main_page():
 """
 
     return {
-        "path": "gyeonggi/",
+        "path": "",
         "title": "경기 출장마사지·홈타이 24시 방문예약｜수원·분당·일산·부천",
         "desc": "경기 전지역 출장마사지·홈타이 24시 예약 상담. 수원·분당·용인·일산·부천·동탄 방문, 이동·비용 안내.",
         "h1": "경기 출장마사지·홈타이 · 주요 생활권 안내",
@@ -325,7 +325,7 @@ def zone_page(zone):
     city_cards = _cards([
         (c["name"], (" · ".join(c["life"][:2]) if c["life"]
                      else "차량 이동 기준 안내") + " 생활권",
-         f'/gyeonggi/{c["slug"]}/')
+         f'/{c["slug"]}/')
         for c in cities
     ])
     # 권역 대표 생활권·역 모으기
@@ -352,7 +352,7 @@ def zone_page(zone):
 <section id="city-summary">
   <h2>{zone['name']} 시군별 한눈 요약</h2>
   <dl class="faq-list">
-    {''.join(f'<dt><a href="/gyeonggi/{c["slug"]}/">{c["name"]}</a></dt><dd>{c["focus"].split(". ")[0]}.</dd>' for c in cities)}
+    {''.join(f'<dt><a href="/{c["slug"]}/">{c["name"]}</a></dt><dd>{c["focus"].split(". ")[0]}.</dd>' for c in cities)}
   </dl>
 </section>
 
@@ -371,17 +371,17 @@ def zone_page(zone):
 <section id="zone-guide">
   <h2>{zone['name']} 이동·예약 기준</h2>
   <p>{zone['name']}은(는) 도심 역세권 생활권과 신도시·외곽 생활권의 예약 기준이 서로 다릅니다. 도심·신도시 생활권은 가까운 역과 기본 이동권을 기준으로 방문 주소를 정하면 되고, 외곽 방향은 예약 전 <strong>차량 이동 가능 여부</strong>, <strong>예약 가능 시간</strong>, <strong>추가 이동비</strong>, <strong>숙소 이용 가능 여부</strong>를 먼저 확인하는 것이 좋습니다.</p>
-  <p>방문 주소가 시군 경계에 있다면 인접 권역·시군 기준이 적용될 수 있으니, 예약 시 도로명 주소와 건물 유형을 함께 알려주시면 가장 빠르게 안내해 드릴 수 있습니다. 권역 전체 안내는 <a href="/gyeonggi/">경기 메인</a>에서, 예약 방법은 <a href="/gyeonggi/reservation/">예약 안내</a>에서 확인하세요.</p>
+  <p>방문 주소가 시군 경계에 있다면 인접 권역·시군 기준이 적용될 수 있으니, 예약 시 도로명 주소와 건물 유형을 함께 알려주시면 가장 빠르게 안내해 드릴 수 있습니다. 권역 전체 안내는 <a href="/">경기 메인</a>에서, 예약 방법은 <a href="/reservation/">예약 안내</a>에서 확인하세요.</p>
 </section>
 {_CHECK_BLOCK}
 {_BYLINE}
 """
     return {
-        "path": f"gyeonggi/zone/{zone['key']}/",
+        "path": f"zone/{zone['key']}/",
         "title": zone["title"],
         "desc": zone["desc"],
         "h1": f"{zone['name']} 출장마사지·홈타이 권역별 생활권 안내",
-        "breadcrumb": [("경기", "/gyeonggi/"), ("권역별 안내", ""), (zone["name"], "")],
+        "breadcrumb": [("경기", "/"), ("권역별 안내", ""), (zone["name"], "")],
         "body": body,
     }
 
@@ -397,7 +397,7 @@ def city_page(c):
         gu_cards = _cards([
             (g["gu"],
              f"행정동 {len(_dongs_of_gu(c['slug'], g['slug']))}곳 · {' · '.join(g['life'][:2])} 생활권",
-             f"/gyeonggi/{c['slug']}/{g['slug']}/")
+             f"/{c['slug']}/{g['slug']}/")
             for g in gu_items
         ])
         struct = (
@@ -411,7 +411,7 @@ def city_page(c):
         all_dongs = _dongs_of_city_nogu(c["slug"])
         if all_dongs:
             dong_links = " · ".join(
-                f'<a href="/gyeonggi/{c["slug"]}/{d["slug"]}/">{d["name"]}</a>'
+                f'<a href="/{c["slug"]}/{d["slug"]}/">{d["name"]}</a>'
                 for d in all_dongs
             )
             struct = (
@@ -433,17 +433,14 @@ def city_page(c):
     life_html = (
         _cards([
             (lf, f"{c['name']} {lf} 생활권 · 출장마사지·홈타이 예약 기준",
-             f"/gyeonggi/life/{_LIFE_SLUG_BY_NAME[lf]}/" if lf in _LIFE_SLUG_BY_NAME
-             else f"/gyeonggi/{c['slug']}/#check")
+             f"/life/{_LIFE_SLUG_BY_NAME[lf]}/" if lf in _LIFE_SLUG_BY_NAME
+             else f"/{c['slug']}/#check")
             for lf in c["life"]
         ])
         if c["life"] else "<p>생활권은 도심권과 외곽권으로 나누어 예약 기준을 확인합니다.</p>"
     )
 
-    nearby_html = _li_links([
-        (f"{name} 출장마사지·홈타이 방문예약", f"/gyeonggi/{slug}/")
-        for name, slug in c["nearby"]
-    ])
+    nearby_html = _li_links([(f"{name} 방문 안내", f"/{slug}/") for name, slug in c["nearby"]])
 
     outer_html = ""
     if c["outer"]:
@@ -466,7 +463,7 @@ def city_page(c):
 <section id="overview">
   <h2>{c['name']}에서 출장마사지를 찾을 때 확인할 기준</h2>
   <p>{c['focus']}</p>
-  <p>{c['name']}은(는) <a href="/gyeonggi/zone/{zone['key']}/">{zone['name']}</a> 권역에 속합니다. 예약 전 자신의 위치가 어느 생활권에 해당하는지, 가장 가까운 역과 기본 이동권 범위 안에 있는지를 먼저 확인하면 예약 과정이 한결 원활합니다.</p>
+  <p>{c['name']}은(는) <a href="/zone/{zone['key']}/">{zone['name']}</a> 권역에 속합니다. 예약 전 자신의 위치가 어느 생활권에 해당하는지, 가장 가까운 역과 기본 이동권 범위 안에 있는지를 먼저 확인하면 예약 과정이 한결 원활합니다.</p>
 </section>
 
 <section id="structure">
@@ -506,12 +503,12 @@ def city_page(c):
 </section>
 """
     return {
-        "path": f"gyeonggi/{c['slug']}/",
+        "path": f"{c['slug']}/",
         "title": c["title"],
         "desc": c["desc"],
         "h1": f"{c['name']} 출장마사지·홈타이 생활권별 예약 안내",
-        "breadcrumb": [("경기", "/gyeonggi/"),
-                        (zone["name"], f"/gyeonggi/zone/{zone['key']}/"),
+        "breadcrumb": [("경기", "/"),
+                        (zone["name"], f"/zone/{zone['key']}/"),
                         (c["name"], "")],
         "extra_head": _faq_schema(faq),
         "body": body,
@@ -522,13 +519,13 @@ def city_page(c):
 def gu_page(g):
     city = CITY_BY_SLUG[g["city"]]
     zone = ZONE_BY_KEY[city["zone"]]
-    base = f'/gyeonggi/{g["city"]}/{g["slug"]}/'
+    base = f'/{g["city"]}/{g["slug"]}/'
 
     # 동별 안내 — (동, 한 줄 특징) 데이터로 구별 고유 본문 구성.
     # 해당 동의 상세 페이지가 있으면 동 이름에 링크를 건다.
     def _dlabel(name):
         slug = _DONG_SLUG_BY_KEY.get((g["city"], name))
-        return (f'<a href="/gyeonggi/{g["city"]}/{g["slug"]}/{slug}/">{name}</a>'
+        return (f'<a href="/{g["city"]}/{g["slug"]}/{slug}/">{name}</a>'
                 if slug else name)
     dong_rows = "".join(
         f"<dt>{_dlabel(d)}</dt><dd>{note} 일대 생활권입니다. 방문 시 정확한 단지·건물명과 출입 방식을 함께 알려주시면 빠르게 안내해 드립니다.</dd>"
@@ -538,13 +535,13 @@ def gu_page(g):
     # 구 소속 전체 행정동 목록(클릭 동선 완결)
     gu_all = _dongs_of_gu(g["city"], g["slug"])
     gu_all_links = " · ".join(
-        f'<a href="/gyeonggi/{g["city"]}/{g["slug"]}/{d["slug"]}/">{d["name"]}</a>'
+        f'<a href="/{g["city"]}/{g["slug"]}/{d["slug"]}/">{d["name"]}</a>'
         for d in gu_all
     )
 
     # 같은 시의 다른 구 (형제 구) 내부링크
     siblings = [x for x in GU_BY_CITY.get(g["city"], []) if x["slug"] != g["slug"]]
-    sib_links = _li_links([(x["gu"], f'/gyeonggi/{g["city"]}/{x["slug"]}/') for x in siblings])
+    sib_links = _li_links([(x["gu"], f'/{g["city"]}/{x["slug"]}/') for x in siblings])
 
     life_html = _cards([
         (lf, f"{g['gu']} {lf} 생활권 · 예약 기준", base + "#check") for lf in g["life"]
@@ -563,7 +560,7 @@ def gu_page(g):
 <section id="overview">
   <h2>{g['city_name']} {g['gu']} 생활권 안내</h2>
   <p>{g['focus']}</p>
-  <p>{g['gu']}는 <a href="/gyeonggi/{g['city']}/">{g['city_name']}</a>의 일반구로, 시 전체 안내와 동 단위 사이의 중간 안내 역할을 합니다. {g['city_name']}은(는) <a href="/gyeonggi/zone/{zone['key']}/">{zone['name']}</a> 권역에 속합니다.</p>
+  <p>{g['gu']}는 <a href="/{g['city']}/">{g['city_name']}</a>의 일반구로, 시 전체 안내와 동 단위 사이의 중간 안내 역할을 합니다. {g['city_name']}은(는) <a href="/zone/{zone['key']}/">{zone['name']}</a> 권역에 속합니다.</p>
 </section>
 
 <section id="dong">
@@ -590,8 +587,8 @@ def gu_page(g):
 
 <section id="parent">
   <h2>상위 시·인접 구 안내</h2>
-  <p>{g['gu']}의 상위 시 전체 안내는 <a href="/gyeonggi/{g['city']}/">{g['city_name']} 출장마사지 안내</a>에서 확인할 수 있습니다. 같은 {g['city_name']} 내 다른 구는 아래에서 확인하세요.</p>
-  <ul>{sib_links or f'<li><a href="/gyeonggi/{g["city"]}/">{g["city_name"]} 전체 안내</a></li>'}</ul>
+  <p>{g['gu']}의 상위 시 전체 안내는 <a href="/{g['city']}/">{g['city_name']} 출장마사지 안내</a>에서 확인할 수 있습니다. 같은 {g['city_name']} 내 다른 구는 아래에서 확인하세요.</p>
+  <ul>{sib_links or f'<li><a href="/{g["city"]}/">{g["city_name"]} 전체 안내</a></li>'}</ul>
 </section>
 {_CHECK_BLOCK}
 {_BYLINE}
@@ -601,13 +598,13 @@ def gu_page(g):
 </section>
 """
     return {
-        "path": f"gyeonggi/{g['city']}/{g['slug']}/",
+        "path": f"{g['city']}/{g['slug']}/",
         "title": f"{g['city_name']} {g['gu']} 출장마사지·홈타이 방문예약｜{' · '.join([d for d, _ in g['dong'][:2]])}",
         "desc": (f"{g['city_name']} {g['gu']} 출장마사지·홈타이 24시 예약 상담. "
                  f"{' · '.join([d for d, _ in g['dong'][:3]])} 등 행정동 방문, 이동·비용 안내.")[:80],
         "h1": f"{g['city_name']} {g['gu']} 출장마사지·홈타이 생활권 안내",
-        "breadcrumb": [("경기", "/gyeonggi/"),
-                        (g["city_name"], f"/gyeonggi/{g['city']}/"),
+        "breadcrumb": [("경기", "/"),
+                        (g["city_name"], f"/{g['city']}/"),
                         (g["gu"], "")],
         "extra_head": _faq_schema(faq),
         "body": body,
@@ -633,7 +630,7 @@ def life_page(l):
 
     # 같은 시의 다른 생활권 (인접 생활권 내부링크)
     siblings = [x for x in LIFE if x["city"] == l["city"] and x["slug"] != l["slug"]]
-    sib_links = _li_links([(x["name"], f"/gyeonggi/life/{x['slug']}/") for x in siblings])
+    sib_links = _li_links([(x["name"], f"/life/{x['slug']}/") for x in siblings])
 
     faq = [
         (f"{l['name']} 생활권은 어디까지 포함되나요?",
@@ -646,7 +643,7 @@ def life_page(l):
 <section id="overview">
   <h2>{l['name']} 생활권 안내</h2>
   <p>{l['focus']}</p>
-  <p>{l['name']}은(는) <a href="/gyeonggi/{l['city']}/">{l['city_name']}</a>에 속한 생활권으로, 시군 안내와 역세권·동 안내를 잇는 허브 역할을 합니다. {l['city_name']}은(는) <a href="/gyeonggi/zone/{zone['key']}/">{zone['name']}</a> 권역입니다.</p>
+  <p>{l['name']}은(는) <a href="/{l['city']}/">{l['city_name']}</a>에 속한 생활권으로, 시군 안내와 역세권·동 안내를 잇는 허브 역할을 합니다. {l['city_name']}은(는) <a href="/zone/{zone['key']}/">{zone['name']}</a> 권역입니다.</p>
 </section>
 
 <section id="stations">
@@ -662,13 +659,13 @@ def life_page(l):
 
 <section id="guide">
   <h2>{l['name']} 이용·예약 기준</h2>
-  <p>{l['name']} 생활권은 같은 {l['city_name']} 안에서도 다른 권역과 이동 기준이 구분됩니다. 방문 주소가 이 생활권에 해당한다면 기본 이동권 범위 안에서 안내되며, 추가 이동비가 발생하는지는 정확한 주소를 확인한 뒤 안내해 드립니다. 자택·숙소·오피스텔 등 방문 장소 유형과 예약 가능 시간을 함께 알려주시면 방문 일정을 빠르게 확정할 수 있습니다. 예약 방법은 <a href="/gyeonggi/reservation/">예약 안내</a>, 확인사항은 <a href="/gyeonggi/check/">이용 전 확인사항</a>에서 볼 수 있습니다.</p>
+  <p>{l['name']} 생활권은 같은 {l['city_name']} 안에서도 다른 권역과 이동 기준이 구분됩니다. 방문 주소가 이 생활권에 해당한다면 기본 이동권 범위 안에서 안내되며, 추가 이동비가 발생하는지는 정확한 주소를 확인한 뒤 안내해 드립니다. 자택·숙소·오피스텔 등 방문 장소 유형과 예약 가능 시간을 함께 알려주시면 방문 일정을 빠르게 확정할 수 있습니다. 예약 방법은 <a href="/reservation/">예약 안내</a>, 확인사항은 <a href="/check/">이용 전 확인사항</a>에서 볼 수 있습니다.</p>
 </section>
 
 <section id="related">
   <h2>관련 시군·생활권 안내</h2>
-  <p>{l['name']}의 상위 시 전체 안내는 <a href="/gyeonggi/{l['city']}/">{l['city_name']} 출장마사지 안내</a>에서 확인하세요. {l['city_name']} 내 다른 생활권은 아래에서 확인할 수 있습니다.</p>
-  <ul>{sib_links or f'<li><a href="/gyeonggi/{l["city"]}/">{l["city_name"]} 전체 안내</a></li>'}</ul>
+  <p>{l['name']}의 상위 시 전체 안내는 <a href="/{l['city']}/">{l['city_name']} 출장마사지 안내</a>에서 확인하세요. {l['city_name']} 내 다른 생활권은 아래에서 확인할 수 있습니다.</p>
+  <ul>{sib_links or f'<li><a href="/{l["city"]}/">{l["city_name"]} 전체 안내</a></li>'}</ul>
 </section>
 {_CHECK_BLOCK}
 {_BYLINE}
@@ -678,13 +675,13 @@ def life_page(l):
 </section>
 """
     return {
-        "path": f"gyeonggi/life/{l['slug']}/",
+        "path": f"life/{l['slug']}/",
         "title": f"{l['name']} 출장마사지·홈타이 방문예약｜{l['city_name']} {l['stations'][0] if l['stations'] else l['dong'][0]}",
         "desc": (f"{l['name']} 출장마사지·홈타이 24시 예약 상담. "
                  f"{l['city_name']} {' · '.join(l['dong'][:2])} 인근 방문, 이동·비용 안내.")[:80],
         "h1": f"{l['name']} 출장마사지·홈타이 생활권 예약 안내",
-        "breadcrumb": [("경기", "/gyeonggi/"),
-                        (l["city_name"], f"/gyeonggi/{l['city']}/"),
+        "breadcrumb": [("경기", "/"),
+                        (l["city_name"], f"/{l['city']}/"),
                         (l["name"], "")],
         "extra_head": _faq_schema(faq),
         "body": body,
@@ -726,9 +723,9 @@ def station_page(s):
 
     # 같은 시의 생활권·다른 역 내부링크
     city_life = [l for l in LIFE if l["city"] == s["city"]]
-    life_links = _li_links([(l["name"], f"/gyeonggi/life/{l['slug']}/") for l in city_life])
+    life_links = _li_links([(l["name"], f"/life/{l['slug']}/") for l in city_life])
     sib_st = [x for x in STATIONS if x["city"] == s["city"] and x["slug"] != s["slug"]]
-    sib_links = _li_links([(x["name"], f"/gyeonggi/station/{x['slug']}/") for x in sib_st])
+    sib_links = _li_links([(x["name"], f"/station/{x['slug']}/") for x in sib_st])
 
     faq = [
         (f"{s['name']}은 무슨 노선인가요?",
@@ -741,7 +738,7 @@ def station_page(s):
 <section id="overview">
   <h2>{s['name']} 역세권 안내</h2>
   <p>{s['focus']}</p>
-  <p>{s['name']}은 <a href="/gyeonggi/{s['city']}/">{s['city_name']}</a>에 위치한 역으로, {' · '.join(s['lines'])} 노선이 지납니다. {s['city_name']}은(는) <a href="/gyeonggi/zone/{zone['key']}/">{zone['name']}</a> 권역이며, 환승역도 출구별·노선별로 나누지 않고 역명 기준 한 곳으로 안내합니다.</p>
+  <p>{s['name']}은 <a href="/{s['city']}/">{s['city_name']}</a>에 위치한 역으로, {' · '.join(s['lines'])} 노선이 지납니다. {s['city_name']}은(는) <a href="/zone/{zone['key']}/">{zone['name']}</a> 권역이며, 환승역도 출구별·노선별로 나누지 않고 역명 기준 한 곳으로 안내합니다.</p>
 </section>
 
 <section id="lines">
@@ -757,7 +754,7 @@ def station_page(s):
 
 <section id="guide">
   <h2>{s['name']} 이용·예약 기준</h2>
-  <p>{s['name']} 인근은 {s['city_name']} 안에서도 다른 권역과 이동 기준이 구분됩니다. 역과 도보권이면 기본 이동권 범위에서 안내되고, 차량 이동이 필요한 거리라면 추가 이동비 발생 여부를 정확한 주소 확인 후 안내해 드립니다. 자택·숙소·오피스텔 등 방문 장소 유형과 예약 가능 시간을 함께 알려주시면 방문 일정을 빠르게 확정할 수 있습니다. 예약 방법은 <a href="/gyeonggi/reservation/">예약 안내</a>, 확인사항은 <a href="/gyeonggi/check/">이용 전 확인사항</a>에서 확인하세요.</p>
+  <p>{s['name']} 인근은 {s['city_name']} 안에서도 다른 권역과 이동 기준이 구분됩니다. 역과 도보권이면 기본 이동권 범위에서 안내되고, 차량 이동이 필요한 거리라면 추가 이동비 발생 여부를 정확한 주소 확인 후 안내해 드립니다. 자택·숙소·오피스텔 등 방문 장소 유형과 예약 가능 시간을 함께 알려주시면 방문 일정을 빠르게 확정할 수 있습니다. 예약 방법은 <a href="/reservation/">예약 안내</a>, 확인사항은 <a href="/check/">이용 전 확인사항</a>에서 확인하세요.</p>
 </section>
 
 <section id="related">
@@ -773,13 +770,13 @@ def station_page(s):
 </section>
 """
     return {
-        "path": f"gyeonggi/station/{s['slug']}/",
+        "path": f"station/{s['slug']}/",
         "title": f"{s['name']} 출장마사지·홈타이 방문예약｜{s['city_name']} 역세권 24시",
         "desc": (f"{s['name']} 출장마사지·홈타이 24시 예약 상담. "
                  f"{s['city_name']} {' · '.join(s['areas'][:2])} 인근 역세권 방문, 이동·비용 안내.")[:80],
         "h1": f"{s['name']} 출장마사지·홈타이 역세권 예약 안내",
-        "breadcrumb": [("경기", "/gyeonggi/"),
-                        (s["city_name"], f"/gyeonggi/{s['city']}/"),
+        "breadcrumb": [("경기", "/"),
+                        (s["city_name"], f"/{s['city']}/"),
                         (s["name"], "")],
         "extra_head": _faq_schema(faq),
         "body": body,
@@ -794,16 +791,16 @@ def dong_page(d):
 
     # URL·브레드크럼 (구 유무에 따라)
     if d["gu"]:
-        path = f"gyeonggi/{d['city']}/{d['gu']}/{d['slug']}/"
-        parent_url = f"/gyeonggi/{d['city']}/{d['gu']}/"
+        path = f"{d['city']}/{d['gu']}/{d['slug']}/"
+        parent_url = f"/{d['city']}/{d['gu']}/"
         parent_label = f"{d['city_name']} {gu_name}"
-        crumb = [("경기", "/gyeonggi/"), (d["city_name"], f"/gyeonggi/{d['city']}/"),
+        crumb = [("경기", "/"), (d["city_name"], f"/{d['city']}/"),
                  (gu_name, parent_url), (d["name"], "")]
     else:
-        path = f"gyeonggi/{d['city']}/{d['slug']}/"
-        parent_url = f"/gyeonggi/{d['city']}/"
+        path = f"{d['city']}/{d['slug']}/"
+        parent_url = f"/{d['city']}/"
         parent_label = f"{d['city_name']}"
-        crumb = [("경기", "/gyeonggi/"), (d["city_name"], parent_url), (d["name"], "")]
+        crumb = [("경기", "/"), (d["city_name"], parent_url), (d["name"], "")]
 
     adj = " · ".join(d["adjacent"]) if d["adjacent"] else "인접 생활권"
     st_html = (_station_links(d["stations"]) if d["stations"]
@@ -811,9 +808,9 @@ def dong_page(d):
 
     # 같은 시 역·생활권 내부링크
     city_life = [l for l in LIFE if l["city"] == d["city"]]
-    life_links = _li_links([(l["name"], f"/gyeonggi/life/{l['slug']}/") for l in city_life])
+    life_links = _li_links([(l["name"], f"/life/{l['slug']}/") for l in city_life])
     near_st = [s for s in STATIONS if s["city"] == d["city"] and s["name"] in d["stations"]]
-    st_links = _li_links([(s["name"], f"/gyeonggi/station/{s['slug']}/") for s in near_st])
+    st_links = _li_links([(s["name"], f"/station/{s['slug']}/") for s in near_st])
 
     # 인접 동을 같은 시 동 페이지로 링크(있으면) — 시→구→동 내부 순환
     adj_links = []
@@ -845,7 +842,7 @@ def dong_page(d):
 <section id="overview">
   <h2>{d['city_name']} {d['name']} 출장마사지·홈타이 안내</h2>
   <p>{d['note']}</p>
-  <p>{d['name']}은(는) <a href="{parent_url}">{parent_label}</a>에 속하는 행정동으로, {d['city_name']}은(는) <a href="/gyeonggi/zone/{zone['key']}/">{zone['name']}</a> 권역에 위치합니다. 경기도는 같은 시·구 안에서도 동에 따라 가까운 역과 이동 기준이 다르기 때문에, 방문 주소가 정확히 {d['name']}에 해당하는지 먼저 확인하면 이동권 안내가 한결 정확합니다. {move_note}</p>
+  <p>{d['name']}은(는) <a href="{parent_url}">{parent_label}</a>에 속하는 행정동으로, {d['city_name']}은(는) <a href="/zone/{zone['key']}/">{zone['name']}</a> 권역에 위치합니다. 경기도는 같은 시·구 안에서도 동에 따라 가까운 역과 이동 기준이 다르기 때문에, 방문 주소가 정확히 {d['name']}에 해당하는지 먼저 확인하면 이동권 안내가 한결 정확합니다. {move_note}</p>
 </section>
 
 <section id="area">
@@ -868,12 +865,12 @@ def dong_page(d):
 
 <section id="guide">
   <h2>{d['name']} 이용·예약 기준</h2>
-  <p>{d['name']} 방문은 기본 이동권 범위 안에서 안내되며, 차량 이동이 필요한 거리라면 추가 이동비 발생 여부를 정확한 주소 확인 후 안내해 드립니다. 자택·숙소·오피스텔 등 방문 장소 유형과 예약 가능 시간, 건물 출입 방식을 함께 알려주시면 방문 일정을 빠르게 확정할 수 있습니다. 예약 방법은 <a href="/gyeonggi/reservation/">예약 안내</a>, 확인사항은 <a href="/gyeonggi/check/">이용 전 확인사항</a>에서 확인하세요.</p>
+  <p>{d['name']} 방문은 기본 이동권 범위 안에서 안내되며, 차량 이동이 필요한 거리라면 추가 이동비 발생 여부를 정확한 주소 확인 후 안내해 드립니다. 자택·숙소·오피스텔 등 방문 장소 유형과 예약 가능 시간, 건물 출입 방식을 함께 알려주시면 방문 일정을 빠르게 확정할 수 있습니다. 예약 방법은 <a href="/reservation/">예약 안내</a>, 확인사항은 <a href="/check/">이용 전 확인사항</a>에서 확인하세요.</p>
 </section>
 
 <section id="related">
   <h2>{d['city_name']} 연결 생활권·역 안내</h2>
-  <p>{d['name']}과(와) 이어지는 {d['city_name']}의 생활권·역세권 안내입니다. 상위 안내는 <a href="{parent_url}">{parent_label} 안내</a>에서, 시 전체 안내는 <a href="/gyeonggi/{d['city']}/">{d['city_name']} 출장마사지·홈타이 안내</a>에서 확인하세요.</p>
+  <p>{d['name']}과(와) 이어지는 {d['city_name']}의 생활권·역세권 안내입니다. 상위 안내는 <a href="{parent_url}">{parent_label} 안내</a>에서, 시 전체 안내는 <a href="/{d['city']}/">{d['city_name']} 출장마사지·홈타이 안내</a>에서 확인하세요.</p>
   <ul>{st_links}{life_links}</ul>
 </section>
 {_CHECK_BLOCK}
@@ -896,7 +893,7 @@ def dong_page(d):
 
 
 def all_pages():
-    pages = [root_redirect_page(), main_page()]
+    pages = [main_page()]
     pages += [zone_page(z) for z in ZONES]
     pages += [city_page(c) for c in CITIES]
     pages += [gu_page(g) for g in GU]

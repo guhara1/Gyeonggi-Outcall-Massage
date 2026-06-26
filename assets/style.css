@@ -673,50 +673,43 @@ strong {
   transform: translateY(0);
 }
 
-/* ── FAB (부동 전화 버튼) ────────────── */
+/* ── 부동 전화 버튼 (전 페이지 고정, 항상 노출) ──────────── */
 .call-fab {
   position: fixed;
-  bottom: 24px;
-  right: 24px;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: var(--orange-primary);
-  color: white;
-  display: flex;
+  right: 18px;
+  bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+  z-index: 200;
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  box-shadow: 0 8px 24px rgba(255, 107, 53, 0.4);
-  transition: var(--transition);
-  z-index: 50;
+  gap: 8px;
+  padding: 13px 20px 13px 16px;
+  border-radius: 30px;
+  background: linear-gradient(135deg, var(--orange-light), var(--orange-primary) 60%, var(--orange-deep));
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.96rem;
   text-decoration: none;
+  white-space: nowrap;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    0 10px 28px rgba(255, 107, 53, 0.46);
+  transition: var(--transition);
 }
 
-.call-fab svg {
-  width: 28px;
-  height: 28px;
-  fill: currentColor;
-}
+.call-fab svg { width: 20px; height: 20px; fill: currentColor; flex-shrink: 0; }
+.call-fab-text { line-height: 1; }
 
 .call-fab:hover {
-  background: var(--orange-hover);
-  box-shadow: 0 12px 32px rgba(255, 107, 53, 0.5);
-  transform: scale(1.1);
+  color: #fff;
+  filter: brightness(1.05);
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    0 14px 34px rgba(255, 107, 53, 0.55);
 }
 
-.call-fab-label {
-  position: absolute;
-  bottom: -32px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  white-space: nowrap;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity var(--transition);
-}
-
-.call-fab:hover .call-fab-label {
-  opacity: 1;
+@media (max-width: 768px) {
+  .call-fab { right: 14px; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); padding: 12px 18px 12px 14px; }
 }
 
 /* ── 브레드크럼 ───────────────────── */

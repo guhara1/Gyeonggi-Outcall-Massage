@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""경기 출장마사지 — 이용 목적별 안내 6개 (/gyeonggi/purpose/<slug>/).
+"""경기 출장마사지 — 이용 목적별 안내 6개 (/purpose/<slug>/).
 
 지역이 아닌 '주제'별 가이드라 페이지마다 내용이 본질적으로 다르다(도어웨이 위험 낮음).
 각 페이지는 고유 본문 + 관련 지역·정보 페이지 내부링크로 구성한다.
@@ -21,8 +21,8 @@ _BOOK_BLOCK = f"""
     <li><strong>예약 시간</strong>과 <strong>이용 장소 유형</strong>(자택·숙소·오피스텔·업무 공간)</li>
     <li><strong>연락처</strong>: 통화 가능한 휴대전화 번호</li>
   </ol>
-  <p>예약 전화: <a href="tel:{PHONE}">{PHONE}</a> · 상담시간 연중무휴 24시간. 자세한 절차는 <a href="/gyeonggi/reservation/">예약 안내</a>, 확인사항은 <a href="/gyeonggi/check/">이용 전 확인사항</a>에서 확인하세요.</p>
-  <p>간다GO는 경기 전지역(경기남부·북부·서부·동부·외곽)을 대상으로 건전한 방문 관리 서비스를 제공합니다. 모든 관리는 안내된 위생·안전 기준 안에서만 이루어지며, 불법적이거나 선정적인 요청에는 어떤 경우에도 응하지 않습니다. 수집된 연락처·주소 등 개인정보는 예약 진행 목적에만 사용되고 목적 달성 후 안전하게 파기됩니다. 권역·시군별 안내는 <a href="/gyeonggi/">경기 메인</a>에서 확인하실 수 있습니다.</p>
+  <p>예약 전화: <a href="tel:{PHONE}">{PHONE}</a> · 상담시간 연중무휴 24시간. 자세한 절차는 <a href="/reservation/">예약 안내</a>, 확인사항은 <a href="/check/">이용 전 확인사항</a>에서 확인하세요.</p>
+  <p>간다GO는 경기 전지역(경기남부·북부·서부·동부·외곽)을 대상으로 건전한 방문 관리 서비스를 제공합니다. 모든 관리는 안내된 위생·안전 기준 안에서만 이루어지며, 불법적이거나 선정적인 요청에는 어떤 경우에도 응하지 않습니다. 수집된 연락처·주소 등 개인정보는 예약 진행 목적에만 사용되고 목적 달성 후 안전하게 파기됩니다. 권역·시군별 안내는 <a href="/">경기 메인</a>에서 확인하실 수 있습니다.</p>
 </section>"""
 
 
@@ -46,9 +46,9 @@ def _faq_block(pairs):
 
 def _p(slug, title, desc, h1, last, body, faq=None):
     page = {
-        "path": f"gyeonggi/purpose/{slug}/",
+        "path": f"purpose/{slug}/",
         "title": title, "desc": desc, "h1": h1,
-        "breadcrumb": [("경기", "/gyeonggi/"), ("이용 목적별 안내", ""), (last, "")],
+        "breadcrumb": [("경기", "/"), ("이용 목적별 안내", ""), (last, "")],
         "body": body,
     }
     body = body + _BOOK_BLOCK
@@ -78,7 +78,7 @@ home = _p(
 <section><h2>주거 형태별 참고</h2>
 <p>아파트는 단지 방문 차량 등록과 공동현관 출입이 핵심이고, 빌라·다세대는 건물 입구와 호수 확인이 중요합니다. 단독주택은 도로명 주소와 대문·현관 위치를 알려주시면 찾기 쉽습니다. 신도시 대단지의 경우 같은 단지에 동이 많으므로 동·호수를 정확히 확인해 주시면 방문 시간을 줄일 수 있습니다.</p></section>
 <section><h2>지역별 자택 방문 안내</h2>
-<p>경기 권역별로 이동 기준이 다릅니다. 도심·신도시 생활권은 기본 이동권 안에서 방문이 가능하고, 외곽 지역은 <a href="/gyeonggi/purpose/travel-fee/">추가 이동비</a> 여부를 먼저 확인합니다. 가까운 지역 안내는 <a href="/gyeonggi/">경기 메인</a>에서 시군·생활권으로 확인하세요. 예약은 <a href="/gyeonggi/reservation/">예약 안내</a>, 사전 확인은 <a href="/gyeonggi/check/">이용 전 확인사항</a>을 참고하시기 바랍니다.</p></section>
+<p>경기 권역별로 이동 기준이 다릅니다. 도심·신도시 생활권은 기본 이동권 안에서 방문이 가능하고, 외곽 지역은 <a href="/purpose/travel-fee/">추가 이동비</a> 여부를 먼저 확인합니다. 가까운 지역 안내는 <a href="/">경기 메인</a>에서 시군·생활권으로 확인하세요. 예약은 <a href="/reservation/">예약 안내</a>, 사전 확인은 <a href="/check/">이용 전 확인사항</a>을 참고하시기 바랍니다.</p></section>
 """,
     faq=[
         ("자택 방문 시 따로 준비할 것이 있나요?",
@@ -111,7 +111,7 @@ lodging = _p(
 <li><strong>예약자 정보</strong>: 통화 가능한 연락처</li>
 </ul></section>
 <section><h2>전시·행사 시즌 참고</h2>
-<p><a href="/gyeonggi/life/ilsan-kintex/">일산 킨텍스</a>, 수원·동탄 등 전시·행사 시즌에는 인근 숙소 방문 수요가 늘어납니다. 여유 있게 예약하시고, 펜션 등 외곽 숙소는 <a href="/gyeonggi/purpose/outer/">외곽 지역 이용 안내</a>와 <a href="/gyeonggi/purpose/travel-fee/">추가 이동비</a>를 함께 확인하세요. 예약 절차는 <a href="/gyeonggi/reservation/">예약 안내</a>에서 확인할 수 있습니다.</p></section>
+<p><a href="/life/ilsan-kintex/">일산 킨텍스</a>, 수원·동탄 등 전시·행사 시즌에는 인근 숙소 방문 수요가 늘어납니다. 여유 있게 예약하시고, 펜션 등 외곽 숙소는 <a href="/purpose/outer/">외곽 지역 이용 안내</a>와 <a href="/purpose/travel-fee/">추가 이동비</a>를 함께 확인하세요. 예약 절차는 <a href="/reservation/">예약 안내</a>에서 확인할 수 있습니다.</p></section>
 """,
     faq=[
         ("호텔 객실로도 방문이 가능한가요?",
@@ -138,9 +138,9 @@ officetel = _p(
 <li><strong>야간 출입</strong>: 야간·새벽 시간대 출입 방법</li>
 </ul></section>
 <section><h2>오피스텔 밀집 생활권</h2>
-<p>오피스텔이 밀집한 대표 생활권으로는 <a href="/gyeonggi/life/suwon-station-ingye/">수원역·인계동</a>, <a href="/gyeonggi/life/bundang-pangyo/">분당·판교</a>, <a href="/gyeonggi/life/bucheon-station-sangdong/">부천역·상동</a>, <a href="/gyeonggi/life/anyang-beomgye-pyeongchon/">안양 범계·평촌</a> 등이 있습니다. 업무·주거가 섞인 복합 단지가 많아, 방문지가 주거용인지 업무용인지에 따라 출입 절차가 다를 수 있습니다.</p></section>
+<p>오피스텔이 밀집한 대표 생활권으로는 <a href="/life/suwon-station-ingye/">수원역·인계동</a>, <a href="/life/bundang-pangyo/">분당·판교</a>, <a href="/life/bucheon-station-sangdong/">부천역·상동</a>, <a href="/life/anyang-beomgye-pyeongchon/">안양 범계·평촌</a> 등이 있습니다. 업무·주거가 섞인 복합 단지가 많아, 방문지가 주거용인지 업무용인지에 따라 출입 절차가 다를 수 있습니다.</p></section>
 <section><h2>역세권 오피스텔 안내</h2>
-<p>역세권별 오피스텔 밀집 지역은 <a href="/gyeonggi/station/suwon-station/">수원역</a>, <a href="/gyeonggi/station/pangyo-station/">판교역</a>, <a href="/gyeonggi/station/bucheon-station/">부천역</a>, <a href="/gyeonggi/station/beomgye-station/">범계역</a> 등에서 확인할 수 있습니다. 업무 목적 방문은 <a href="/gyeonggi/purpose/business/">업무지구 예약 안내</a>도 함께 참고하세요.</p></section>
+<p>역세권별 오피스텔 밀집 지역은 <a href="/station/suwon-station/">수원역</a>, <a href="/station/pangyo-station/">판교역</a>, <a href="/station/bucheon-station/">부천역</a>, <a href="/station/beomgye-station/">범계역</a> 등에서 확인할 수 있습니다. 업무 목적 방문은 <a href="/purpose/business/">업무지구 예약 안내</a>도 함께 참고하세요.</p></section>
 """,
     faq=[
         ("오피스텔 공동현관은 어떻게 출입하나요?",
@@ -169,7 +169,7 @@ business = _p(
 <section><h2>업무지구 이용 시간 참고</h2>
 <p>업무지구는 점심시간이나 업무 종료 후 시간대에 방문 수요가 몰리는 편입니다. 보안 데스크 운영 시간과 방문자 출입 가능 시간이 건물마다 다르므로, 원하는 시간대에 출입이 가능한지 예약 시 함께 확인하면 일정 조율이 수월합니다. 야간·휴일 출입은 입주사 또는 관리실 협조가 필요한 경우가 있습니다.</p></section>
 <section><h2>주요 업무지구 안내</h2>
-<p>대표 업무지구는 <a href="/gyeonggi/life/bundang-pangyo/">분당·판교</a>, <a href="/gyeonggi/life/gwanggyo-yeongtong/">광교·영통</a>, <a href="/gyeonggi/life/dongtan-newtown/">동탄신도시</a> 등입니다. 오피스텔 방문은 <a href="/gyeonggi/purpose/officetel/">오피스텔 이용 안내</a>를, 예약 절차는 <a href="/gyeonggi/reservation/">예약 안내</a>를 함께 참고하시기 바랍니다.</p></section>
+<p>대표 업무지구는 <a href="/life/bundang-pangyo/">분당·판교</a>, <a href="/life/gwanggyo-yeongtong/">광교·영통</a>, <a href="/life/dongtan-newtown/">동탄신도시</a> 등입니다. 오피스텔 방문은 <a href="/purpose/officetel/">오피스텔 이용 안내</a>를, 예약 절차는 <a href="/reservation/">예약 안내</a>를 함께 참고하시기 바랍니다.</p></section>
 """,
     faq=[
         ("업무 공간으로도 방문이 가능한가요?",
@@ -192,13 +192,13 @@ outer = _p(
 <ul>
 <li><strong>방문 가능 주소</strong>와 <strong>예약 가능 시간</strong></li>
 <li><strong>차량 이동 가능 여부</strong>(거리·도로 사정)</li>
-<li><strong>추가 이동비</strong> 발생 여부 — <a href="/gyeonggi/purpose/travel-fee/">추가 이동비 안내</a> 참고</li>
+<li><strong>추가 이동비</strong> 발생 여부 — <a href="/purpose/travel-fee/">추가 이동비 안내</a> 참고</li>
 <li><strong>숙소 이용 가능 여부</strong>(펜션·풀빌라 방문)</li>
 </ul></section>
 <section><h2>외곽에서 자주 묻는 방문 유형</h2>
-<p>외곽 지역은 펜션·풀빌라·전원주택 방문 비중이 높습니다. 이런 숙소·주택은 도심과 떨어져 있고 도로명 주소만으로 위치를 찾기 어려운 경우가 있어, 예약 시 가까운 랜드마크나 진입로 정보를 함께 알려주시면 방문이 원활합니다. 숙소 방문은 <a href="/gyeonggi/purpose/lodging/">호텔·숙소 이용 안내</a>도 함께 참고하세요.</p></section>
+<p>외곽 지역은 펜션·풀빌라·전원주택 방문 비중이 높습니다. 이런 숙소·주택은 도심과 떨어져 있고 도로명 주소만으로 위치를 찾기 어려운 경우가 있어, 예약 시 가까운 랜드마크나 진입로 정보를 함께 알려주시면 방문이 원활합니다. 숙소 방문은 <a href="/purpose/lodging/">호텔·숙소 이용 안내</a>도 함께 참고하세요.</p></section>
 <section><h2>외곽 권역 안내</h2>
-<p>외곽 지역은 <a href="/gyeonggi/zone/outer-area/">경기외곽 권역</a>에서 가평·연천·포천·여주·양평 안내를 확인할 수 있습니다. 동부·북부 외곽은 <a href="/gyeonggi/zone/east/">경기동부</a>, <a href="/gyeonggi/zone/north/">경기북부</a> 권역도 함께 참고하세요.</p></section>
+<p>외곽 지역은 <a href="/zone/outer-area/">경기외곽 권역</a>에서 가평·연천·포천·여주·양평 안내를 확인할 수 있습니다. 동부·북부 외곽은 <a href="/zone/east/">경기동부</a>, <a href="/zone/north/">경기북부</a> 권역도 함께 참고하세요.</p></section>
 """,
     faq=[
         ("외곽 지역도 정말 방문이 가능한가요?",
@@ -227,7 +227,7 @@ travel_fee = _p(
 <section><h2>도심·신도시는 기본 이동권 안에서</h2>
 <p>수원·성남·부천·안양·고양 등 도심·신도시 생활권은 대부분 기본 이동권 범위 안에 있어 별도의 추가 이동비 없이 방문이 가능합니다. 같은 시라도 외곽 읍면 방향은 거리가 멀어질 수 있으므로, 방문 주소가 도심권인지 외곽권인지 확인하면 비용을 미리 가늠할 수 있습니다.</p></section>
 <section><h2>예약 전 확인 방법</h2>
-<p>추가 이동비 발생 여부와 금액은 예약 상담 시 정확한 주소를 기준으로 안내됩니다. 외곽 방문은 <a href="/gyeonggi/purpose/outer/">외곽 지역 이용 안내</a>를, 예약 절차는 <a href="/gyeonggi/reservation/">예약 안내</a>를 함께 확인하세요. 모든 비용은 예약 시 투명하게 안내됩니다.</p></section>
+<p>추가 이동비 발생 여부와 금액은 예약 상담 시 정확한 주소를 기준으로 안내됩니다. 외곽 방문은 <a href="/purpose/outer/">외곽 지역 이용 안내</a>를, 예약 절차는 <a href="/reservation/">예약 안내</a>를 함께 확인하세요. 모든 비용은 예약 시 투명하게 안내됩니다.</p></section>
 """,
     faq=[
         ("추가 이동비는 얼마인가요?",
