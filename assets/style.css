@@ -1074,6 +1074,20 @@ body::before {
 .byline p:last-child { margin-bottom: 0; }
 .byline strong { color: var(--gold-soft); }
 
+/* 행정동 전체 목록 — 칩 형태 링크 묶음 */
+.dong-list { line-height: 2.2; }
+.dong-list a {
+  display: inline-block;
+  padding: 3px 10px;
+  margin: 2px 1px;
+  border: 1px solid var(--glass-line);
+  border-radius: 14px;
+  background: var(--glass);
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+.dong-list a:hover { border-color: var(--orange-primary); color: var(--orange-light); }
+
 @media (prefers-reduced-motion: reduce) {
   * {
     animation: none !important;

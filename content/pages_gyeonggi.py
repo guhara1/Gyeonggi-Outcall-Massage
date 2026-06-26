@@ -34,6 +34,14 @@ def _dong_url(city, name):
     gu, slug = ref
     return f"/gyeonggi/{city}/{gu}/{slug}/" if gu else f"/gyeonggi/{city}/{slug}/"
 
+
+def _dongs_of_gu(city, gu):
+    return [d for d in DONGS if d["city"] == city and d["gu"] == gu]
+
+
+def _dongs_of_city_nogu(city):
+    return [d for d in DONGS if d["city"] == city and d["gu"] is None]
+
 # 생활권 이름 → 슬러그 (시군 페이지에서 생활권 허브로 링크)
 _LIFE_SLUG_BY_NAME = {l["name"]: l["slug"] for l in LIFE}
 # 역 이름 → 슬러그 (시군·생활권 페이지에서 역세권 허브로 링크)
@@ -376,14 +384,21 @@ def city_page(c):
             f'<p>대표 동: {", ".join(c["dong"])}</p>'
         )
     else:
-        def _dlabel(name):
-            slug = _DONG_SLUG_BY_KEY.get((c["slug"], name))
-            return (f'<a href="/gyeonggi/{c["slug"]}/{slug}/">{name}</a>' if slug else name)
-        dong_txt = " · ".join(_dlabel(d) for d in c["dong"]) if c["dong"] else "도심·외곽 생활권 기준 안내"
-        struct = (
-            f'<p><strong>{c["name"]}</strong>은(는) 시군 → 읍면동 구조로 안내합니다. '
-            f'대표 동: {dong_txt}</p>'
-        )
+        all_dongs = _dongs_of_city_nogu(c["slug"])
+        if all_dongs:
+            dong_links = " · ".join(
+                f'<a href="/gyeonggi/{c["slug"]}/{d["slug"]}/">{d["name"]}</a>'
+                for d in all_dongs
+            )
+            struct = (
+                f'<p><strong>{c["name"]}</strong>은(는) 시군 → 읍면동 구조로 안내합니다. '
+                f'아래 {len(all_dongs)}개 읍·면·동을 클릭하면 동별 방문 안내로 이동합니다. '
+                f'(1·2·3동 등 번호 동은 대표 동 하나로 묶었습니다.)</p>'
+                f'<p class="dong-list">{dong_links}</p>'
+            )
+        else:
+            struct = (f'<p><strong>{c["name"]}</strong>은(는) 시군 → 읍면동 구조로 안내합니다. '
+                      f'도심권과 외곽 생활권 기준으로 방문 안내를 확인하세요.</p>')
 
     stations_html = (
         f'<p>{_station_links(c["stations"])}</p>'
@@ -493,6 +508,13 @@ def gu_page(g):
         for d, note in g["dong"]
     )
 
+    # 구 소속 전체 행정동 목록(클릭 동선 완결)
+    gu_all = _dongs_of_gu(g["city"], g["slug"])
+    gu_all_links = " · ".join(
+        f'<a href="/gyeonggi/{g["city"]}/{g["slug"]}/{d["slug"]}/">{d["name"]}</a>'
+        for d in gu_all
+    )
+
     # 같은 시의 다른 구 (형제 구) 내부링크
     siblings = [x for x in GU_BY_CITY.get(g["city"], []) if x["slug"] != g["slug"]]
     sib_links = _li_links([(x["gu"], f'/gyeonggi/{g["city"]}/{x["slug"]}/') for x in siblings])
@@ -521,6 +543,12 @@ def gu_page(g):
   <h2>{g['gu']} 대표 동 안내</h2>
   <p>{g['gu']} 안에서도 동에 따라 가까운 역과 생활권이 다릅니다. 방문 주소가 어느 동인지 확인하면 이동 기준을 정확히 안내해 드릴 수 있습니다.</p>
   <dl class="faq-list">{dong_rows}</dl>
+</section>
+
+<section id="dong-all">
+  <h2>{g['gu']} 행정동 전체 안내</h2>
+  <p>{g['gu']} 소속 행정동입니다. 아래에서 동을 클릭하면 동별 출장마사지·홈타이 방문 안내로 이동합니다. (1·2·3동 등 번호 동은 대표 동 하나로 묶었습니다.)</p>
+  <p class="dong-list">{gu_all_links}</p>
 </section>
 
 <section id="stations">
