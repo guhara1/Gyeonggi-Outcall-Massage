@@ -20,7 +20,9 @@ from content import PAGES
 from content.site import (BASE_URL, BRAND, BRAND_MARK, NAV, PHONE,
                           PHONE_DISPLAY, AREA_SERVED, TAGLINE,
                           PRICING, PRICING_TITLE, PRICING_NOTE, PRICING_FOOT,
-                          RATING_VALUE, REVIEW_COUNT, REVIEWS)
+                          RATING_VALUE, REVIEW_COUNT, REVIEWS,
+                          NAVER_SITE_VERIFICATION, GOOGLE_SITE_VERIFICATION,
+                          INDEXNOW_KEY)
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 # Cloudflare Pages가 빌드를 실행하지 않고 저장소 루트를 그대로 배포하므로
@@ -307,6 +309,13 @@ def render_page(page: dict) -> str:
     )
     canonical = BASE_URL.rstrip("/") + "/" + path
 
+    # 검색엔진 사이트 인증 메타 (값이 있을 때만 출력)
+    verify_meta = ""
+    if NAVER_SITE_VERIFICATION:
+        verify_meta += f'<meta name="naver-site-verification" content="{NAVER_SITE_VERIFICATION}">\n'
+    if GOOGLE_SITE_VERIFICATION:
+        verify_meta += f'<meta name="google-site-verification" content="{GOOGLE_SITE_VERIFICATION}">\n'
+
     # 히어로가 있는 페이지(메인)는 H1을 히어로 안에서 출력한다.
     if hero:
         page_head = hero
@@ -339,7 +348,8 @@ def render_page(page: dict) -> str:
 <title>{title}</title>
 <meta name="description" content="{desc}">
 {robots}
-<link rel="canonical" href="{canonical}">
+{verify_meta}<link rel="canonical" href="{canonical}">
+<link rel="alternate" type="application/rss+xml" title="{BRAND} 새 소식" href="{BASE_URL.rstrip('/')}/feed.xml">
 <meta property="og:type" content="website">
 <meta property="og:title" content="{title}">
 <meta property="og:description" content="{desc}">
@@ -476,26 +486,64 @@ def build() -> None:
         chars = text_length(page["body"])
         noindex = page.get("noindex", False) or chars < MIN_INDEX_CHARS
         if not noindex:
-            sitemap_urls.append(BASE_URL.rstrip("/") + "/" + path)
+            sitemap_urls.append((BASE_URL.rstrip("/") + "/" + path,
+                                 page.get("title", BRAND), page.get("desc", "")))
         report.append((path or "/", chars, "noindex" if noindex else "index"))
 
-    # sitemap.xml
-    urls = "\n".join(
-        f"  <url><loc>{u}</loc></url>" for u in sitemap_urls
+    base = BASE_URL.rstrip("/")
+    from datetime import datetime, timezone
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    rfc822 = datetime.now(timezone.utc).strftime("%a, %d %b %Y %H:%M:%S +0000")
+
+    # sitemap.xml (lastmod·changefreq·priority 포함)
+    def _priority(u):
+        depth = u[len(base):].strip("/").count("/")
+        return "1.0" if u.rstrip("/") == base else max(0.5, 0.9 - depth * 0.1)
+    rows = "\n".join(
+        f"  <url><loc>{u}</loc><lastmod>{today}</lastmod>"
+        f"<changefreq>weekly</changefreq><priority>{_priority(u)}</priority></url>"
+        for u, _t, _d in sitemap_urls
     )
     with open(os.path.join(PUBLIC_DIR, "sitemap.xml"), "w", encoding="utf-8") as f:
         f.write(
             '<?xml version="1.0" encoding="UTF-8"?>\n'
             '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
-            f"{urls}\n</urlset>\n"
+            f"{rows}\n</urlset>\n"
         )
 
-    # robots.txt
+    # feed.xml (RSS 2.0) — 네이버·피드 색인용. 상위 80개 URL 노출.
+    def _esc(s):
+        return (s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;"))
+    feed_items = "\n".join(
+        f"  <item><title>{_esc(t)}</title><link>{u}</link>"
+        f"<guid>{u}</guid><description>{_esc(d)}</description>"
+        f"<pubDate>{rfc822}</pubDate></item>"
+        for u, t, d in sitemap_urls[:80]
+    )
+    with open(os.path.join(PUBLIC_DIR, "feed.xml"), "w", encoding="utf-8") as f:
+        f.write(
+            '<?xml version="1.0" encoding="UTF-8"?>\n'
+            '<rss version="2.0"><channel>\n'
+            f"<title>{BRAND} · 경기 출장마사지·홈타이 안내</title>\n"
+            f"<link>{base}/</link>\n"
+            f"<description>경기 전지역 방문 관리 서비스 안내</description>\n"
+            f"<language>ko</language>\n<lastBuildDate>{rfc822}</lastBuildDate>\n"
+            f"{feed_items}\n</channel></rss>\n"
+        )
+
+    # robots.txt (sitemap + feed 안내, 주요 봇 허용)
     with open(os.path.join(PUBLIC_DIR, "robots.txt"), "w", encoding="utf-8") as f:
         f.write(
             "User-agent: *\nAllow: /\n\n"
-            f"Sitemap: {BASE_URL.rstrip('/')}/sitemap.xml\n"
+            "User-agent: Yeti\nAllow: /\n\n"          # 네이버 봇
+            "User-agent: Googlebot\nAllow: /\n\n"
+            "User-agent: bingbot\nAllow: /\n\n"
+            f"Sitemap: {base}/sitemap.xml\n"
         )
+
+    # IndexNow 키 파일 (루트에 <KEY>.txt) — 콘텐츠는 키 그 자체
+    with open(os.path.join(PUBLIC_DIR, f"{INDEXNOW_KEY}.txt"), "w", encoding="utf-8") as f:
+        f.write(INDEXNOW_KEY)
 
     # .nojekyll (GitHub Pages)
     open(os.path.join(PUBLIC_DIR, ".nojekyll"), "w").close()

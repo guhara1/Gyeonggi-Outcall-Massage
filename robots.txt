@@ -1,4 +1,13 @@
 User-agent: *
 Allow: /
 
+User-agent: Yeti
+Allow: /
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: bingbot
+Allow: /
+
 Sitemap: https://gyeonggi-outcall-massage.pages.dev/sitemap.xml
