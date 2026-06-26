@@ -256,6 +256,25 @@ def main_page():
   {life_grid}
 </section>
 
+<section id="popular">
+  <h2>경기 인기 검색 지역 바로가기</h2>
+  <p>경기에서 방문 예약이 많은 생활권·역세권입니다. 찾으시는 지역을 바로 확인하세요.</p>
+  <ul class="dong-list">
+    <li><a href="/gyeonggi/station/suwon-station/">수원역 출장마사지 홈타이 방문예약</a></li>
+    <li><a href="/gyeonggi/life/bundang-pangyo/">분당·판교 출장마사지 홈타이 예약</a></li>
+    <li><a href="/gyeonggi/life/dongtan-newtown/">동탄신도시 출장마사지 홈타이</a></li>
+    <li><a href="/gyeonggi/life/ilsan-kintex/">일산 킨텍스 출장마사지 홈타이</a></li>
+    <li><a href="/gyeonggi/life/bucheon-station-sangdong/">부천역·상동 출장마사지 홈타이</a></li>
+    <li><a href="/gyeonggi/life/ansan-jungang-choji/">안산중앙·초지 출장마사지 홈타이</a></li>
+    <li><a href="/gyeonggi/life/anyang-beomgye-pyeongchon/">범계·평촌 출장마사지 홈타이</a></li>
+    <li><a href="/gyeonggi/life/hanam-misa/">하남 미사 출장마사지 홈타이</a></li>
+    <li><a href="/gyeonggi/life/gimpo-gurae/">김포 구래 출장마사지 홈타이</a></li>
+    <li><a href="/gyeonggi/life/uijeongbu-station-minrak/">의정부역·민락 출장마사지 홈타이</a></li>
+    <li><a href="/gyeonggi/life/gwangmyeong-cheolsan/">광명 철산 출장마사지 홈타이</a></li>
+    <li><a href="/gyeonggi/station/jeongja-station/">정자역 출장마사지 홈타이 방문예약</a></li>
+  </ul>
+</section>
+
 <section id="purpose">
   <h2>이용 목적별 안내</h2>
   <p>방문 장소와 목적에 따라 확인할 점이 다릅니다. 자택·숙소·오피스텔·업무지구·외곽 방문과 추가 이동비 기준을 안내합니다.</p>
@@ -421,7 +440,10 @@ def city_page(c):
         if c["life"] else "<p>생활권은 도심권과 외곽권으로 나누어 예약 기준을 확인합니다.</p>"
     )
 
-    nearby_html = _li_links([(name, f"/gyeonggi/{slug}/") for name, slug in c["nearby"]])
+    nearby_html = _li_links([
+        (f"{name} 출장마사지·홈타이 방문예약", f"/gyeonggi/{slug}/")
+        for name, slug in c["nearby"]
+    ])
 
     outer_html = ""
     if c["outer"]:

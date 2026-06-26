@@ -18,7 +18,9 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from content import PAGES
 from content.site import (BASE_URL, BRAND, BRAND_MARK, NAV, PHONE,
-                          PHONE_DISPLAY, AREA_SERVED, TAGLINE)
+                          PHONE_DISPLAY, AREA_SERVED, TAGLINE,
+                          PRICING, PRICING_TITLE, PRICING_NOTE, PRICING_FOOT,
+                          RATING_VALUE, REVIEW_COUNT, REVIEWS)
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 # Cloudflare Pages가 빌드를 실행하지 않고 저장소 루트를 그대로 배포하므로
@@ -117,8 +119,82 @@ def _ld(obj: dict) -> str:
     )
 
 
+def render_pricing() -> str:
+    """요금표 (메인·전 지역 페이지 공통). class='pricing'은 본문 글자수 측정에서 제외된다."""
+    cards = []
+    for course, price, time_label, desc, featured, _min in PRICING:
+        cls = "price-card featured" if featured else "price-card"
+        badge = '<span class="price-badge">추천</span>' if featured else ""
+        btn = "btn-price featured" if featured else "btn-price"
+        cards.append(
+            f'<div class="{cls}">{badge}'
+            f'<p class="price-course">{course}</p>'
+            f'<p class="price-amount">{price}<span class="price-won">원</span></p>'
+            f'<p class="price-time">{time_label}</p>'
+            f'<p class="price-desc">{desc}</p>'
+            f'<a class="{btn}" href="tel:{PHONE}">예약 문의</a>'
+            f'</div>'
+        )
+    return (
+        '<section class="pricing" aria-label="요금 안내">'
+        '<div class="container pricing-inner">'
+        f'<h2 class="pricing-title">{PRICING_TITLE}</h2>'
+        f'<p class="pricing-note">{PRICING_NOTE}</p>'
+        f'<div class="price-grid">{"".join(cards)}</div>'
+        f'<p class="pricing-foot">{PRICING_FOOT} '
+        '<a href="/gyeonggi/reservation/">요금·예약 기준 자세히 보기 →</a></p>'
+        '</div></section>'
+    )
+
+
+def render_reviews() -> str:
+    """이용 후기 (평점 + 후기) — 스키마(aggregateRating/review)와 일치하는 가시 콘텐츠."""
+    stars = "★★★★★"
+    items = []
+    for author, rating, date, body in REVIEWS:
+        r = int(rating)
+        star = f'<span class="rv-stars">{"★" * r}{"☆" * (5 - r)}</span>'
+        items.append(
+            f'<li class="rv-item">{star}'
+            f'<p class="rv-body">{body}</p>'
+            f'<p class="rv-meta">{author} · {date}</p></li>'
+        )
+    return (
+        '<section class="reviews" aria-label="이용 후기">'
+        '<div class="container reviews-inner">'
+        '<h2 class="reviews-title">이용 후기</h2>'
+        f'<p class="reviews-score"><span class="rv-stars">{stars}</span> '
+        f'<strong>{RATING_VALUE}</strong> / 5.0 · 후기 {REVIEW_COUNT}건</p>'
+        f'<ul class="reviews-list">{"".join(items)}</ul>'
+        '</div></section>'
+    )
+
+
+def _aggregate_rating() -> dict:
+    return {
+        "@type": "AggregateRating",
+        "ratingValue": RATING_VALUE,
+        "reviewCount": REVIEW_COUNT,
+        "bestRating": "5",
+        "worstRating": "1",
+    }
+
+
+def _review_list() -> list:
+    out = []
+    for author, rating, date, body in REVIEWS:
+        out.append({
+            "@type": "Review",
+            "author": {"@type": "Person", "name": author},
+            "datePublished": date,
+            "reviewRating": {"@type": "Rating", "ratingValue": rating, "bestRating": "5"},
+            "reviewBody": body,
+        })
+    return out
+
+
 def make_org_schema() -> dict:
-    """사이트 전역 Organization 스키마 (모든 페이지 공통)."""
+    """사이트 전역 Organization 스키마 (모든 페이지 공통) — 평점·후기 포함."""
     base = BASE_URL.rstrip("/")
     return {
         "@context": "https://schema.org",
@@ -137,6 +213,40 @@ def make_org_schema() -> dict:
             "availableLanguage": ["ko"],
             "areaServed": "KR",
         },
+        "aggregateRating": _aggregate_rating(),
+        "review": _review_list(),
+    }
+
+
+def make_service_schema() -> dict:
+    """Service 스키마 — 코스별 요금(Offer)·평점 포함 (화면 요금표와 일치)."""
+    base = BASE_URL.rstrip("/")
+    offers = []
+    for course, price, _time, desc, _featured, _min in PRICING:
+        offers.append({
+            "@type": "Offer",
+            "name": course,
+            "description": desc,
+            "price": price.replace(",", ""),
+            "priceCurrency": "KRW",
+            "availability": "https://schema.org/InStock",
+        })
+    return {
+        "@context": "https://schema.org",
+        "@type": "Service",
+        "@id": base + "/#service",
+        "serviceType": "출장마사지·홈타이 방문 관리",
+        "provider": {"@id": base + "/#organization"},
+        "areaServed": {"@type": "AdministrativeArea", "name": AREA_SERVED},
+        "offers": {
+            "@type": "AggregateOffer",
+            "priceCurrency": "KRW",
+            "lowPrice": "90000",
+            "highPrice": "180000",
+            "offerCount": str(len(offers)),
+            "offers": offers,
+        },
+        "aggregateRating": _aggregate_rating(),
     }
 
 
@@ -213,9 +323,10 @@ def render_page(page: dict) -> str:
     # 메인(hero 보유)은 main.py의 extra_head에 풍부한 스키마가 이미 있으므로
     # Organization만 보강하고, 나머지 페이지는 Organization + WebPage + BreadcrumbList를 생성한다.
     if hero:
-        auto_schema = _ld(make_org_schema())
+        auto_schema = _ld(make_org_schema()) + _ld(make_service_schema())
     else:
-        blocks = [make_org_schema(), make_webpage_schema(title, desc, canonical)]
+        blocks = [make_org_schema(), make_service_schema(),
+                  make_webpage_schema(title, desc, canonical)]
         if crumbs:
             blocks.append(make_breadcrumb_schema(crumbs))
         auto_schema = "".join(_ld(b) for b in blocks)
@@ -275,6 +386,8 @@ def render_page(page: dict) -> str:
     </article>
   </div>
 </main>
+{render_pricing()}
+{render_reviews()}
 <footer class="site-footer">
   <div class="container footer-grid">
     <div class="footer-col footer-about">
