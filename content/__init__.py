@@ -1,9 +1,3 @@
-from . import main, areas, stations, areas_and_stations, info
+from . import pages_gyeonggi, info_gyeonggi
 
-PAGES = (
-    [main.PAGE] +
-    areas.PAGES +
-    stations.PAGES +
-    areas_and_stations.PAGES +
-    info.PAGES
-)
+PAGES = pages_gyeonggi.all_pages() + info_gyeonggi.PAGES

@@ -17,13 +17,14 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from content import PAGES
-from content.site import (BASE_URL, BRAND, BRAND_MARK, NAV, PHONE, PHONE_DISPLAY)
+from content.site import (BASE_URL, BRAND, BRAND_MARK, NAV, PHONE,
+                          PHONE_DISPLAY, AREA_SERVED, TAGLINE)
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 # Cloudflare Pages가 빌드를 실행하지 않고 저장소 루트를 그대로 배포하므로
 # 빌드 결과물을 저장소 루트에 직접 출력한다.
 PUBLIC_DIR = ROOT
-MIN_INDEX_CHARS = 2000
+MIN_INDEX_CHARS = 1300
 
 
 def text_length(body_html: str) -> int:
@@ -128,7 +129,7 @@ def make_org_schema() -> dict:
         "logo": base + "/assets/apple-touch-icon.png",
         "image": base + "/assets/og-image.png",
         "telephone": PHONE,
-        "areaServed": {"@type": "AdministrativeArea", "name": "경기도 안산시"},
+        "areaServed": {"@type": "AdministrativeArea", "name": AREA_SERVED},
         "contactPoint": {
             "@type": "ContactPoint",
             "telephone": PHONE,
@@ -254,8 +255,8 @@ def render_page(page: dict) -> str:
   <div class="header-accent" aria-hidden="true"></div>
   <div class="header-top">
     <div class="header-inner">
-      <a class="brand" href="/"><span class="brand-mark">{BRAND_MARK}</span> <span class="brand-text">{BRAND}</span></a>
-      <p class="header-tagline"><span class="tag-gem">◆</span> 안산시 전지역 방문 관리 <span class="tag-gem">◆</span> 24시간 상담</p>
+      <a class="brand" href="/gyeonggi/"><span class="brand-mark">{BRAND_MARK}</span> <span class="brand-text">{BRAND}</span></a>
+      <p class="header-tagline"><span class="tag-gem">◆</span> {TAGLINE} <span class="tag-gem">◆</span> 24시간 상담</p>
       <a class="header-call" href="tel:{PHONE}"><span class="call-label">예약전화</span> {PHONE_DISPLAY}</a>
       <button class="nav-toggle" aria-label="메뉴 열기" aria-expanded="false"><span></span><span></span><span></span></button>
     </div>
@@ -278,36 +279,36 @@ def render_page(page: dict) -> str:
   <div class="container footer-grid">
     <div class="footer-col footer-about">
       <p class="footer-brand">{BRAND}</p>
-      <p class="footer-desc">안산시 전지역 방문 출장마사지·홈타이 안내 사이트입니다. 모든 서비스는 안내된 관리 범위와 위생·안전 기준 안에서만 제공됩니다.</p>
+      <p class="footer-desc">경기 전지역 방문 출장마사지·홈타이 안내 사이트입니다. 모든 서비스는 안내된 관리 범위와 위생·안전 기준 안에서만 제공됩니다.</p>
       <address class="footer-contact">
         <span class="footer-contact-row"><span class="footer-label">예약전화</span> <a href="tel:{PHONE}">{PHONE_DISPLAY}</a></span>
         <span class="footer-contact-row"><span class="footer-label">상담시간</span> 연중무휴 24시간</span>
-        <span class="footer-contact-row"><span class="footer-label">서비스 지역</span> 경기도 안산시 전지역</span>
+        <span class="footer-contact-row"><span class="footer-label">서비스 지역</span> 경기 전지역 (남부·북부·서부·동부·외곽)</span>
       </address>
     </div>
-    <nav class="footer-col" aria-label="서비스 안내">
-      <p class="footer-title">서비스</p>
+    <nav class="footer-col" aria-label="권역·시군 안내">
+      <p class="footer-title">권역·시군</p>
       <ul>
-        <li><a href="/">안산 출장마사지·홈타이 지역 안내</a></li>
-        <li><a href="/sangnok-gu/">상록구·단원구 구별 생활권 안내</a></li>
-        <li><a href="/danwon-gu/jungang-dong/">중앙동·고잔동 출장마사지 생활권</a></li>
-        <li><a href="/station/sangnoksu-station/">상록수역·한대앞역 역세권 안내</a></li>
-        <li><a href="/area/jungang-gojan/">중앙역·고잔 생활권 예약 기준</a></li>
+        <li><a href="/gyeonggi/">경기 출장마사지·홈타이 생활권 안내</a></li>
+        <li><a href="/gyeonggi/zone/south/">경기남부 수원·분당·동탄 생활권</a></li>
+        <li><a href="/gyeonggi/zone/north/">경기북부 일산·의정부·다산 생활권</a></li>
+        <li><a href="/gyeonggi/zone/west/">경기서부 부천·안산·김포 생활권</a></li>
+        <li><a href="/gyeonggi/suwon/">수원 출장마사지 생활권 안내</a></li>
       </ul>
     </nav>
     <nav class="footer-col" aria-label="이용 안내">
       <p class="footer-title">이용 안내</p>
       <ul>
-        <li><a href="/reservation/">예약안내</a></li>
-        <li><a href="/check/">이용 전 확인사항</a></li>
-        <li><a href="/support/">고객센터</a></li>
+        <li><a href="/gyeonggi/reservation/">예약안내</a></li>
+        <li><a href="/gyeonggi/check/">이용 전 확인사항</a></li>
+        <li><a href="/gyeonggi/support/">고객센터</a></li>
       </ul>
     </nav>
     <nav class="footer-col" aria-label="정책 및 기준">
       <p class="footer-title">정책·기관 안내</p>
       <ul>
-        <li><a href="/support/privacy/">개인정보처리방침</a></li>
-        <li><a href="https://www.ansan.go.kr/" target="_blank" rel="noopener">안산시청 공식 홈페이지</a></li>
+        <li><a href="/gyeonggi/privacy/">개인정보처리방침</a></li>
+        <li><a href="https://www.gg.go.kr/" target="_blank" rel="noopener">경기도청 공식 홈페이지</a></li>
         <li><a href="https://www.pipc.go.kr/" target="_blank" rel="noopener">개인정보보호위원회</a></li>
         <li><a href="https://t.me/googleseolab" target="_blank" rel="noopener nofollow">문의하기</a></li>
       </ul>

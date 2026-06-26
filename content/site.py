@@ -1,50 +1,42 @@
-# 안산시 출장마사지 사이트 공통 설정
+# 경기 출장마사지 사이트 공통 설정
 
-BASE_URL = "https://ansan-massage1.pages.dev"
+BASE_URL = "https://gyeonggi-massage.pages.dev"
 
 BRAND = "간다GO"
 BRAND_MARK = "간"  # 헤더 로고 원형 마크 글자
 PHONE = "0508-202-4719"
 PHONE_DISPLAY = "0508-202-4719"
 
-# 상단 메뉴 — 키워드 반복 없음, 지역명·역명만 표시
+AREA_SERVED = "경기도"
+TAGLINE = "경기 전지역 방문 관리"
+
+# 상단 메뉴 — 키워드(출장마사지) 반복 없이 권역·지역명만 표시
 NAV = [
-    ("안산", "/", []),
-    ("구별 안내", "/", [
-        ("상록구", "/sangnok-gu/"),
-        ("단원구", "/danwon-gu/"),
+    ("경기", "/gyeonggi/", []),
+    ("권역별 안내", "/gyeonggi/", [
+        ("경기남부", "/gyeonggi/zone/south/"),
+        ("경기북부", "/gyeonggi/zone/north/"),
+        ("경기서부", "/gyeonggi/zone/west/"),
+        ("경기동부", "/gyeonggi/zone/east/"),
+        ("경기외곽", "/gyeonggi/zone/outer-area/"),
     ]),
-    ("지역별 안내", "/", [
-        ("중앙동", "/danwon-gu/jungang-dong/"),
-        ("고잔동", "/danwon-gu/gojan-dong/"),
-        ("초지동", "/danwon-gu/choji-dong/"),
-        ("원곡동", "/danwon-gu/wongok-dong/"),
-        ("선부동", "/danwon-gu/seonbu-dong/"),
-        ("본오동", "/sangnok-gu/bono-dong/"),
-        ("사동", "/sangnok-gu/sa-dong/"),
-        ("월피동", "/sangnok-gu/wolpi-dong/"),
+    ("시군별 안내", "/gyeonggi/", [
+        ("수원", "/gyeonggi/suwon/"),
+        ("성남", "/gyeonggi/seongnam/"),
+        ("용인", "/gyeonggi/yongin/"),
+        ("고양", "/gyeonggi/goyang/"),
+        ("화성", "/gyeonggi/hwaseong/"),
+        ("부천", "/gyeonggi/bucheon/"),
+        ("안산", "/gyeonggi/ansan/"),
+        ("안양", "/gyeonggi/anyang/"),
+        ("김포", "/gyeonggi/gimpo/"),
+        ("남양주", "/gyeonggi/namyangju/"),
+        ("의정부", "/gyeonggi/uijeongbu/"),
+        ("하남", "/gyeonggi/hanam/"),
     ]),
-    ("역세권 안내", "/", [
-        ("상록수역", "/station/sangnoksu-station/"),
-        ("한대앞역", "/station/hanyang-univ-at-ansan-station/"),
-        ("중앙역", "/station/jungang-station/"),
-        ("고잔역", "/station/gojan-station/"),
-        ("초지역", "/station/choji-station/"),
-        ("안산역", "/station/ansan-station/"),
-        ("선부역", "/station/seonbu-station/"),
-        ("원곡역", "/station/wongok-station/"),
-        ("원시역", "/station/wonsi-station/"),
-    ]),
-    ("생활권 안내", "/", [
-        ("중앙역·고잔", "/area/jungang-gojan/"),
-        ("초지역·초지동", "/area/choji-dong/"),
-        ("안산역·원곡동", "/area/ansan-station-wongok/"),
-        ("상록수·본오", "/area/sangnoksu-bono/"),
-        ("선부역·선부동", "/area/seonbu-station/"),
-    ]),
-    ("예약 안내", "/reservation/", []),
-    ("이용 전 확인사항", "/check/", []),
-    ("고객센터", "/support/", [
-        ("개인정보처리방침", "/support/privacy/"),
+    ("예약 안내", "/gyeonggi/reservation/", []),
+    ("이용 전 확인사항", "/gyeonggi/check/", []),
+    ("고객센터", "/gyeonggi/support/", [
+        ("개인정보처리방침", "/gyeonggi/privacy/"),
     ]),
 ]
