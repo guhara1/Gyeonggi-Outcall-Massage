@@ -13,6 +13,7 @@ import json
 
 from .site import BASE_URL
 from .gyeonggi_data import ZONES, CITIES, ZONE_BY_KEY, CITY_BY_SLUG
+from .gyeonggi_gu_data import GU, GU_BY_CITY
 
 _BASE = BASE_URL.rstrip("/")
 
@@ -298,9 +299,14 @@ def city_page(c):
 
     # 구조: 일반구가 있으면 구 → 동, 없으면 동
     if c["gu"]:
+        gu_items = GU_BY_CITY.get(c["slug"], [])
+        gu_links = " · ".join(
+            f'<a href="/gyeonggi/{c["slug"]}/{g["slug"]}/">{g["gu"]}</a>' for g in gu_items
+        ) or ", ".join(c["gu"])
         struct = (
             f'<p><strong>{c["name"]}</strong>은(는) {", ".join(c["gu"])} 일반구로 나뉩니다. '
-            f'시 → 구 → 동 구조로 생활권을 확인하면 방문 주소를 더 정확히 정할 수 있습니다.</p>'
+            f'시 → 구 → 동 구조로 생활권을 확인하면 방문 주소를 더 정확히 정할 수 있습니다. '
+            f'각 구별 안내는 다음에서 확인하세요: {gu_links}.</p>'
             f'<p>대표 동: {", ".join(c["dong"])}</p>'
         )
     else:
@@ -391,8 +397,85 @@ def city_page(c):
     }
 
 
+# ── 일반구 페이지 ───────────────────────────────────────────
+def gu_page(g):
+    city = CITY_BY_SLUG[g["city"]]
+    zone = ZONE_BY_KEY[city["zone"]]
+    base = f'/gyeonggi/{g["city"]}/{g["slug"]}/'
+
+    # 동별 안내 — (동, 한 줄 특징) 데이터로 구별 고유 본문 구성
+    dong_rows = "".join(
+        f"<dt>{d}</dt><dd>{note} 일대 생활권입니다. 방문 시 정확한 단지·건물명과 출입 방식을 함께 알려주시면 빠르게 안내해 드립니다.</dd>"
+        for d, note in g["dong"]
+    )
+
+    # 같은 시의 다른 구 (형제 구) 내부링크
+    siblings = [x for x in GU_BY_CITY.get(g["city"], []) if x["slug"] != g["slug"]]
+    sib_links = _li_links([(x["gu"], f'/gyeonggi/{g["city"]}/{x["slug"]}/') for x in siblings])
+
+    life_html = _cards([
+        (lf, f"{g['gu']} {lf} 생활권 · 예약 기준", base + "#check") for lf in g["life"]
+    ]) if g["life"] else ""
+
+    faq = [
+        (f"{g['city_name']} {g['gu']}는 어디까지 방문이 가능한가요?",
+         f"{g['gu']} 전역으로 방문 가능합니다. {' · '.join(d for d, _ in g['dong'][:4])} 등 동별로 가까운 역과 이동권이 다르므로 예약 시 정확한 주소를 알려주세요."),
+        (f"{g['gu']}에서 가까운 역은 어디인가요?",
+         f"{' · '.join(g['stations']) if g['stations'] else '도시철도 역이 제한적이라 차량 이동 기준으로 안내합니다.'} 환승역도 역명 기준 한 곳으로 안내합니다."),
+        (f"{g['gu']} 예약 전 확인할 사항은 무엇인가요?",
+         "방문 가능 주소, 예약 가능 시간, 추가 이동비 여부, 건물 출입 방식을 먼저 확인하면 예약이 수월합니다."),
+    ]
+
+    body = f"""
+<section id="overview">
+  <h2>{g['city_name']} {g['gu']} 생활권 안내</h2>
+  <p>{g['focus']}</p>
+  <p>{g['gu']}는 <a href="/gyeonggi/{g['city']}/">{g['city_name']}</a>의 일반구로, 시 전체 안내와 동 단위 사이의 중간 안내 역할을 합니다. {g['city_name']}은(는) <a href="/gyeonggi/zone/{zone['key']}/">{zone['name']}</a> 권역에 속합니다.</p>
+</section>
+
+<section id="dong">
+  <h2>{g['gu']} 대표 동 안내</h2>
+  <p>{g['gu']} 안에서도 동에 따라 가까운 역과 생활권이 다릅니다. 방문 주소가 어느 동인지 확인하면 이동 기준을 정확히 안내해 드릴 수 있습니다.</p>
+  <dl class="faq-list">{dong_rows}</dl>
+</section>
+
+<section id="stations">
+  <h2>{g['gu']} 가까운 역</h2>
+  <p>{' · '.join(g['stations']) if g['stations'] else '이 구는 도시철도 역세권이 제한적이라 차량 이동 기준과 방문 가능 주소를 먼저 확인하는 것이 좋습니다.'}</p>
+</section>
+
+<section id="life">
+  <h2>{g['gu']} 관련 생활권</h2>
+  {life_html or '<p>도심권과 주거권으로 나누어 예약 기준을 확인합니다.</p>'}
+</section>
+
+<section id="parent">
+  <h2>상위 시·인접 구 안내</h2>
+  <p>{g['gu']}의 상위 시 전체 안내는 <a href="/gyeonggi/{g['city']}/">{g['city_name']} 출장마사지 안내</a>에서 확인할 수 있습니다. 같은 {g['city_name']} 내 다른 구는 아래에서 확인하세요.</p>
+  <ul>{sib_links or f'<li><a href="/gyeonggi/{g["city"]}/">{g["city_name"]} 전체 안내</a></li>'}</ul>
+</section>
+{_CHECK_BLOCK}
+<section id="faq">
+  <h2>{g['city_name']} {g['gu']} 자주 묻는 질문</h2>
+  <dl class="faq-list">{''.join(f'<dt>{q}</dt><dd>{a}</dd>' for q, a in faq)}</dl>
+</section>
+"""
+    return {
+        "path": f"gyeonggi/{g['city']}/{g['slug']}/",
+        "title": f"{g['city_name']} {g['gu']} 출장마사지·홈타이 생활권 안내",
+        "desc": f"{g['city_name']} {g['gu']} 출장마사지·홈타이 — {' · '.join([d for d, _ in g['dong'][:3]])} 생활권 안내.",
+        "h1": f"{g['city_name']} {g['gu']} 출장마사지 · 생활권 안내",
+        "breadcrumb": [("경기", "/gyeonggi/"),
+                        (g["city_name"], f"/gyeonggi/{g['city']}/"),
+                        (g["gu"], "")],
+        "extra_head": _faq_schema(faq),
+        "body": body,
+    }
+
+
 def all_pages():
     pages = [root_redirect_page(), main_page()]
     pages += [zone_page(z) for z in ZONES]
     pages += [city_page(c) for c in CITIES]
+    pages += [gu_page(g) for g in GU]
     return pages
