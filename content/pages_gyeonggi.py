@@ -11,7 +11,7 @@ gyeonggi_data 의 구조화 데이터를 받아 페이지 dict 를 생성한다.
 """
 import json
 
-from .site import BASE_URL
+from .site import BASE_URL, BRAND, PHONE
 from .gyeonggi_data import ZONES, CITIES, ZONE_BY_KEY, CITY_BY_SLUG
 from .gyeonggi_gu_data import GU, GU_BY_CITY
 from .gyeonggi_life_data import LIFE
@@ -22,6 +22,17 @@ from .gyeonggi_dong_data import DONGS
 _GU_NAME = {(g["city"], g["slug"]): g["gu"] for g in GU}
 # (city, 동 한글명) → 동 슬러그 (구·시 페이지에서 동 상세로 링크)
 _DONG_SLUG_BY_KEY = {(d["city"], d["name"]): d["slug"] for d in DONGS}
+# (city, 동 한글명) → (구 슬러그 또는 None, 동 슬러그) — 인접 동 정확 링크용
+_DONG_REF_BY_KEY = {(d["city"], d["name"]): (d["gu"], d["slug"]) for d in DONGS}
+
+
+def _dong_url(city, name):
+    """같은 시의 동 이름 → 실제 URL(구 유무 반영). 없으면 None."""
+    ref = _DONG_REF_BY_KEY.get((city, name))
+    if not ref:
+        return None
+    gu, slug = ref
+    return f"/gyeonggi/{city}/{gu}/{slug}/" if gu else f"/gyeonggi/{city}/{slug}/"
 
 # 생활권 이름 → 슬러그 (시군 페이지에서 생활권 허브로 링크)
 _LIFE_SLUG_BY_NAME = {l["name"]: l["slug"] for l in LIFE}
@@ -36,6 +47,32 @@ def _station_links(names):
         slug = _STATION_SLUG_BY_NAME.get(n)
         out.append(f'<a href="/gyeonggi/station/{slug}/">{n}</a>' if slug else n)
     return " · ".join(out)
+
+
+# 이용 목적별(롱테일 주제) 내부링크 — 방문 장소 안내 6개
+_PURPOSE = [
+    ("자택", "home"), ("호텔·숙소", "lodging"), ("오피스텔", "officetel"),
+    ("업무지구", "business"), ("외곽 지역", "outer"), ("추가 이동비", "travel-fee"),
+]
+
+
+def _purpose_links():
+    return _li_links([(f"{n} 이용 안내", f"/gyeonggi/purpose/{s}/") for n, s in _PURPOSE])
+
+
+# E-E-A-T 신호: 작성·검수 바이라인 + 연락처(YMYL 신뢰 신호).
+_BYLINE = (
+    '<section id="byline" class="byline">'
+    '<h2>작성·검수 안내</h2>'
+    f'<p>이 안내는 <strong>{BRAND}</strong> 운영팀이 직접 방문 가능 지역과 이동 기준을 '
+    '정리하고 검수해 작성했습니다. 지역 구분·역세권·이동권 정보는 실제 예약 상담 데이터를 '
+    '바탕으로 주기적으로 갱신합니다.</p>'
+    f'<p><strong>운영</strong> {BRAND} 편집팀 · <strong>예약·문의</strong> '
+    f'<a href="tel:{PHONE}">{PHONE}</a> (연중무휴 24시간) · '
+    '<strong>회사 안내</strong> <a href="/gyeonggi/support/">고객센터</a> · '
+    '<strong>개인정보</strong> <a href="/gyeonggi/privacy/">처리방침</a></p>'
+    '</section>'
+)
 
 _BASE = BASE_URL.rstrip("/")
 
@@ -234,7 +271,7 @@ def main_page():
     <li><strong>개인정보 처리 기준</strong>과 <strong>불법·선정적 서비스 불가</strong> 안내</li>
   </ul>
 </section>
-
+{_BYLINE}
 <section id="faq">
   <h2>경기 출장마사지 자주 묻는 질문</h2>
   <dl class="faq-list">
@@ -310,6 +347,7 @@ def zone_page(zone):
   <p>방문 주소가 시군 경계에 있다면 인접 권역·시군 기준이 적용될 수 있으니, 예약 시 도로명 주소와 건물 유형을 함께 알려주시면 가장 빠르게 안내해 드릴 수 있습니다. 권역 전체 안내는 <a href="/gyeonggi/">경기 메인</a>에서, 예약 방법은 <a href="/gyeonggi/reservation/">예약 안내</a>에서 확인하세요.</p>
 </section>
 {_CHECK_BLOCK}
+{_BYLINE}
 """
     return {
         "path": f"gyeonggi/zone/{zone['key']}/",
@@ -405,14 +443,21 @@ def city_page(c):
 </section>
 {_life_detail(c)}
 {outer_html}
+<section id="places">
+  <h2>{c['name']} 방문 장소별 안내</h2>
+  <p>{c['name']}에서는 자택·숙소·오피스텔·업무 공간 등 방문 장소에 따라 확인할 점이 다릅니다. 목적별 안내에서 출입 기준과 준비 사항을 확인하세요.</p>
+  <ul>{_purpose_links()}</ul>
+</section>
+
 <section id="nearby">
   <h2>{c['name']} 인접 시군 안내</h2>
   <p>{c['name']}과(와) 이동권이 이어지는 인접 시군입니다. 방문 주소가 경계 지역이라면 인접 시군 안내도 함께 확인하세요.</p>
   <ul>{nearby_html}</ul>
 </section>
 {_CHECK_BLOCK}
+{_BYLINE}
 <section id="faq">
-  <h2>{c['name']} 출장마사지 자주 묻는 질문</h2>
+  <h2>{c['name']} 출장마사지·홈타이 자주 묻는 질문</h2>
   <dl class="faq-list">
     {''.join(f'<dt>{q}</dt><dd>{a}</dd>' for q, a in faq)}
   </dl>
@@ -494,6 +539,7 @@ def gu_page(g):
   <ul>{sib_links or f'<li><a href="/gyeonggi/{g["city"]}/">{g["city_name"]} 전체 안내</a></li>'}</ul>
 </section>
 {_CHECK_BLOCK}
+{_BYLINE}
 <section id="faq">
   <h2>{g['city_name']} {g['gu']} 자주 묻는 질문</h2>
   <dl class="faq-list">{''.join(f'<dt>{q}</dt><dd>{a}</dd>' for q, a in faq)}</dl>
@@ -569,6 +615,7 @@ def life_page(l):
   <ul>{sib_links or f'<li><a href="/gyeonggi/{l["city"]}/">{l["city_name"]} 전체 안내</a></li>'}</ul>
 </section>
 {_CHECK_BLOCK}
+{_BYLINE}
 <section id="faq">
   <h2>{l['name']} 자주 묻는 질문</h2>
   <dl class="faq-list">{''.join(f'<dt>{q}</dt><dd>{a}</dd>' for q, a in faq)}</dl>
@@ -662,6 +709,7 @@ def station_page(s):
   <ul>{life_links}{sib_links}</ul>
 </section>
 {_CHECK_BLOCK}
+{_BYLINE}
 <section id="faq">
   <h2>{s['name']} 자주 묻는 질문</h2>
   <dl class="faq-list">{''.join(f'<dt>{q}</dt><dd>{a}</dd>' for q, a in faq)}</dl>
@@ -709,24 +757,55 @@ def dong_page(d):
     near_st = [s for s in STATIONS if s["city"] == d["city"] and s["name"] in d["stations"]]
     st_links = _li_links([(s["name"], f"/gyeonggi/station/{s['slug']}/") for s in near_st])
 
+    # 인접 동을 같은 시 동 페이지로 링크(있으면) — 시→구→동 내부 순환
+    adj_links = []
+    for a in d["adjacent"]:
+        url = _dong_url(d["city"], a)
+        adj_links.append(f'<a href="{url}">{a}</a>' if url else a)
+    adj_linked = " · ".join(adj_links) if adj_links else "인접 생활권"
+
+    zone_outer = CITY_BY_SLUG[d["city"]]["outer"]
+    move_note = (
+        f"{d['name']}은(는) 도심권과 외곽 차량 이동권이 함께 있는 {d['city_name']}에 속해, "
+        "방문 주소에 따라 기본 이동권과 추가 이동비 적용이 달라질 수 있습니다."
+        if zone_outer else
+        f"{d['name']}은(는) 비교적 이동 동선이 명확한 생활권으로, 도보권이면 기본 이동권 안에서 안내됩니다."
+    )
+
     faq = [
-        (f"{d['name']}도 방문이 가능한가요?",
+        (f"{d['name']}도 출장마사지·홈타이 방문이 가능한가요?",
          f"{d['city_name']} {d['name']} 전역으로 방문 가능합니다. {adj} 등 인접 지역과 이동권이 이어지며, 정확한 단지·건물명과 출입 방식을 알려주시면 예약이 수월합니다."),
         (f"{d['name']}에서 가까운 역은 어디인가요?",
          f"{' · '.join(d['stations']) if d['stations'] else '가까운 도시철도 역이 제한적이라 차량 이동 기준으로 안내합니다.'} 환승역도 역명 기준 한 곳으로 안내합니다."),
+        (f"{d['name']}은 어떤 장소로 방문하나요?",
+         "자택·숙소·오피스텔·업무 공간 등으로 방문 가능합니다. 방문 장소 유형에 따라 출입 절차가 다르므로 예약 시 함께 알려주세요."),
+        (f"{d['name']} 예약 시 추가 비용이 있나요?",
+         "기본 이동권 안이면 추가 이동비가 없습니다. 외곽·원거리는 거리 기준으로 발생할 수 있으며, 정확한 금액은 주소 확인 후 사전에 안내합니다."),
     ]
 
     body = f"""
 <section id="overview">
-  <h2>{d['city_name']} {d['name']} 출장마사지 안내</h2>
+  <h2>{d['city_name']} {d['name']} 출장마사지·홈타이 안내</h2>
   <p>{d['note']}</p>
-  <p>{d['name']}은(는) <a href="{parent_url}">{parent_label}</a>에 속하는 동으로, {d['city_name']}은(는) <a href="/gyeonggi/zone/{zone['key']}/">{zone['name']}</a> 권역입니다. 같은 {d['city_name']} 안에서도 동에 따라 가까운 역과 이동 기준이 다르므로, 방문 주소가 {d['name']}인지 확인하면 안내가 정확합니다.</p>
+  <p>{d['name']}은(는) <a href="{parent_url}">{parent_label}</a>에 속하는 행정동으로, {d['city_name']}은(는) <a href="/gyeonggi/zone/{zone['key']}/">{zone['name']}</a> 권역에 위치합니다. 경기도는 같은 시·구 안에서도 동에 따라 가까운 역과 이동 기준이 다르기 때문에, 방문 주소가 정확히 {d['name']}에 해당하는지 먼저 확인하면 이동권 안내가 한결 정확합니다. {move_note}</p>
 </section>
 
-<section id="nearby">
-  <h2>{d['name']} 인접 동·가까운 역</h2>
-  <p>인접 지역: {adj}</p>
-  <p>가까운 역: {st_html}. 환승역도 노선별로 나누지 않고 역명 기준 한 곳으로 안내합니다.</p>
+<section id="area">
+  <h2>{d['name']} 위치와 생활권</h2>
+  <p>{d['name']}은(는) {parent_label} 생활권의 한 축을 이루며, 인접한 {adj_linked} 일대와 이동권이 자연스럽게 이어집니다. 같은 동 안에서도 대단지 아파트, 빌라·다세대, 오피스텔, 단독주택 등 주거 형태가 섞여 있어 방문 위치에 따라 출입 방식이 달라집니다. 예약 시 단지명과 동·호수, 또는 건물명과 공동현관 출입 방법을 함께 알려주시면 방문 동선을 정확히 잡을 수 있습니다.</p>
+  <p>{d['name']}이(가) 시·구 경계에 가까운 경우에는 인접 동이나 인접 생활권 기준이 적용될 수 있습니다. 정확한 도로명 주소를 알려주시면 어느 이동권으로 안내하는지 빠르게 확인해 드립니다.</p>
+</section>
+
+<section id="transport">
+  <h2>{d['name']} 교통·이동 안내</h2>
+  <p>가까운 역: {st_html}. 환승역도 노선별·출구별로 나누지 않고 역명 기준 한 곳으로 안내합니다. 역과 도보권인 주소는 기본 이동권 범위에서 안내되고, 역과 떨어진 주소는 차량 이동 기준으로 안내합니다.</p>
+  <p>인접 동·생활권: {adj_linked}. 방문 주소가 이 가운데 어디와 더 가까운지에 따라 이동 동선이 달라질 수 있습니다.</p>
+</section>
+
+<section id="places">
+  <h2>{d['name']} 방문 장소별 안내</h2>
+  <p>{d['name']}에서는 방문 장소 유형에 따라 확인할 점이 다릅니다. 아래 목적별 안내에서 주거·숙소·업무 공간별 출입 기준과 준비 사항을 확인하세요.</p>
+  <ul>{_purpose_links()}</ul>
 </section>
 
 <section id="guide">
@@ -736,10 +815,11 @@ def dong_page(d):
 
 <section id="related">
   <h2>{d['city_name']} 연결 생활권·역 안내</h2>
-  <p>{d['name']}과(와) 이어지는 {d['city_name']}의 생활권·역세권 안내입니다. 상위 안내는 <a href="{parent_url}">{parent_label} 안내</a>에서 확인하세요.</p>
+  <p>{d['name']}과(와) 이어지는 {d['city_name']}의 생활권·역세권 안내입니다. 상위 안내는 <a href="{parent_url}">{parent_label} 안내</a>에서, 시 전체 안내는 <a href="/gyeonggi/{d['city']}/">{d['city_name']} 출장마사지·홈타이 안내</a>에서 확인하세요.</p>
   <ul>{st_links}{life_links}</ul>
 </section>
 {_CHECK_BLOCK}
+{_BYLINE}
 <section id="faq">
   <h2>{d['city_name']} {d['name']} 자주 묻는 질문</h2>
   <dl class="faq-list">{''.join(f'<dt>{q}</dt><dd>{a}</dd>' for q, a in faq)}</dl>

@@ -1054,6 +1054,26 @@ body::before {
 /* 푸터 상단 골드 헤어라인 */
 .site-footer { border-top-color: var(--line-soft); }
 
+/* E-E-A-T 작성·검수 바이라인 — 골드 라인 글래스 카드 */
+.byline {
+  margin-top: 40px;
+  padding: 20px 24px;
+  background: var(--glass);
+  border: 1px solid var(--glass-line);
+  border-left: 3px solid var(--gold);
+  border-radius: 12px;
+  box-shadow: var(--ring-gold);
+}
+.byline h2 {
+  margin-top: 0;
+  font-size: 1.1rem;
+  padding-bottom: 8px;
+}
+.byline h2::before { background: var(--gold); }
+.byline p { font-size: 0.9rem; color: var(--text-dim); margin-bottom: 8px; }
+.byline p:last-child { margin-bottom: 0; }
+.byline strong { color: var(--gold-soft); }
+
 @media (prefers-reduced-motion: reduce) {
   * {
     animation: none !important;
