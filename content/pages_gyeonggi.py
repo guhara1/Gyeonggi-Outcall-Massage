@@ -290,8 +290,8 @@ def main_page():
 
     return {
         "path": "gyeonggi/",
-        "title": "경기 출장마사지｜수원·분당·용인·부천·일산 홈타이 안내",
-        "desc": "경기 출장마사지·홈타이 예약 전 수원, 분당, 용인, 부천, 일산, 동탄 생활권을 확인하세요.",
+        "title": "경기 출장마사지·홈타이 24시 방문예약｜수원·분당·일산·부천",
+        "desc": "경기 전지역 출장마사지·홈타이 24시 예약 상담. 수원·분당·용인·일산·부천·동탄 방문, 이동·비용 안내.",
         "h1": "경기 출장마사지·홈타이 · 주요 생활권 안내",
         "hero": hero,
         "breadcrumb": [],
@@ -580,8 +580,9 @@ def gu_page(g):
 """
     return {
         "path": f"gyeonggi/{g['city']}/{g['slug']}/",
-        "title": f"{g['city_name']} {g['gu']} 출장마사지·홈타이 생활권 안내",
-        "desc": f"{g['city_name']} {g['gu']} 출장마사지·홈타이 — {' · '.join([d for d, _ in g['dong'][:3]])} 생활권 안내.",
+        "title": f"{g['city_name']} {g['gu']} 출장마사지·홈타이 방문예약｜{' · '.join([d for d, _ in g['dong'][:2]])}",
+        "desc": (f"{g['city_name']} {g['gu']} 출장마사지·홈타이 24시 예약 상담. "
+                 f"{' · '.join([d for d, _ in g['dong'][:3]])} 등 행정동 방문, 이동·비용 안내.")[:80],
         "h1": f"{g['city_name']} {g['gu']} 출장마사지·홈타이 생활권 안내",
         "breadcrumb": [("경기", "/gyeonggi/"),
                         (g["city_name"], f"/gyeonggi/{g['city']}/"),
@@ -656,8 +657,9 @@ def life_page(l):
 """
     return {
         "path": f"gyeonggi/life/{l['slug']}/",
-        "title": f"{l['name']} 출장마사지·홈타이 생활권 안내",
-        "desc": f"{l['name']} 출장마사지·홈타이 — {l['city_name']} {' · '.join(l['dong'][:2])} 생활권 예약 안내.",
+        "title": f"{l['name']} 출장마사지·홈타이 방문예약｜{l['city_name']} {l['stations'][0] if l['stations'] else l['dong'][0]}",
+        "desc": (f"{l['name']} 출장마사지·홈타이 24시 예약 상담. "
+                 f"{l['city_name']} {' · '.join(l['dong'][:2])} 인근 방문, 이동·비용 안내.")[:80],
         "h1": f"{l['name']} 출장마사지·홈타이 생활권 예약 안내",
         "breadcrumb": [("경기", "/gyeonggi/"),
                         (l["city_name"], f"/gyeonggi/{l['city']}/"),
@@ -750,8 +752,9 @@ def station_page(s):
 """
     return {
         "path": f"gyeonggi/station/{s['slug']}/",
-        "title": f"{s['name']} 출장마사지·홈타이 역세권 안내",
-        "desc": f"{s['name']} 출장마사지·홈타이 — {s['city_name']} {' · '.join(s['areas'][:2])} 인근 생활권 안내.",
+        "title": f"{s['name']} 출장마사지·홈타이 방문예약｜{s['city_name']} 역세권 24시",
+        "desc": (f"{s['name']} 출장마사지·홈타이 24시 예약 상담. "
+                 f"{s['city_name']} {' · '.join(s['areas'][:2])} 인근 역세권 방문, 이동·비용 안내.")[:80],
         "h1": f"{s['name']} 출장마사지·홈타이 역세권 예약 안내",
         "breadcrumb": [("경기", "/gyeonggi/"),
                         (s["city_name"], f"/gyeonggi/{s['city']}/"),
@@ -860,8 +863,9 @@ def dong_page(d):
 """
     return {
         "path": path,
-        "title": f"{d['city_name']} {d['name']} 출장마사지·홈타이 안내",
-        "desc": f"{d['city_name']} {d['name']} 출장마사지·홈타이 — {adj} 인근 생활권 예약 안내."[:79],
+        "title": f"{d['city_name']} {d['name']} 출장마사지·홈타이 24시 방문예약｜간다GO",
+        "desc": (f"{d['city_name']} {d['name']} 출장마사지·홈타이 24시 예약 상담. "
+                 f"{adj} 인근 방문, 이동·비용 안내.")[:80],
         "h1": f"{d['city_name']} {d['name']} 출장마사지·홈타이 생활권 안내",
         "breadcrumb": crumb,
         "extra_head": _faq_schema(faq),
