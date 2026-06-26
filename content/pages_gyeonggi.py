@@ -211,6 +211,19 @@ def main_page():
   {life_grid}
 </section>
 
+<section id="purpose">
+  <h2>이용 목적별 안내</h2>
+  <p>방문 장소와 목적에 따라 확인할 점이 다릅니다. 자택·숙소·오피스텔·업무지구·외곽 방문과 추가 이동비 기준을 안내합니다.</p>
+  {_cards([
+    ("자택 이용 안내", "자택 방문 시 주소·출입·준비 사항", "/gyeonggi/purpose/home/"),
+    ("호텔·숙소 이용 안내", "호텔·펜션 방문 시 건물명·객실 안내", "/gyeonggi/purpose/lodging/"),
+    ("오피스텔 이용 안내", "오피스텔 공동현관·호수 출입 안내", "/gyeonggi/purpose/officetel/"),
+    ("업무지구 예약 안내", "판교·광교·동탄 업무지구 출입 안내", "/gyeonggi/purpose/business/"),
+    ("외곽 지역 이용 안내", "가평·연천·포천 등 차량 이동 기준", "/gyeonggi/purpose/outer/"),
+    ("추가 이동비 안내", "기본 이동권과 추가 이동비 기준", "/gyeonggi/purpose/travel-fee/"),
+  ])}
+</section>
+
 <section id="outer">
   <h2>경기 외곽 지역 예약 전 확인사항</h2>
   <p>경기도는 외곽 지역이 많아 도심형 예약 기준과 외곽형 예약 기준을 분리해야 합니다. 양평, 가평, 연천, 포천, 안성, 여주, 이천 일부 지역은 예약 전 차량 이동 가능 여부와 추가 이동비 여부를 먼저 확인해야 합니다.</p>
