@@ -26,13 +26,19 @@ assets/
 
 ## URL 구조
 
-| 페이지 | URL |
-|---|---|
-| 루트 | `/` → `/gyeonggi/` 리다이렉트 |
-| 경기 메인 | `/gyeonggi/` |
-| 권역(5) | `/gyeonggi/zone/{south,north,west,east,outer-area}/` |
-| 시군(31) | `/gyeonggi/{slug}/` (예: `/gyeonggi/suwon/`) |
-| 정보 | `/gyeonggi/{reservation,check,privacy,support}/` |
+| 페이지 | URL | 수 |
+|---|---|---|
+| 루트 | `/` → `/gyeonggi/` 리다이렉트 | 1 |
+| 경기 메인 | `/gyeonggi/` | 1 |
+| 권역 | `/gyeonggi/zone/{south,north,west,east,outer-area}/` | 5 |
+| 시군 | `/gyeonggi/{slug}/` (예: `/gyeonggi/suwon/`) | 31 |
+| 일반구 | `/gyeonggi/{city}/{gu}/` (예: `/gyeonggi/suwon/paldal-gu/`) | 20 |
+| 생활권 | `/gyeonggi/life/{slug}/` (예: `/gyeonggi/life/bundang-pangyo/`) | 25 |
+| 역세권 | `/gyeonggi/station/{slug}/` (예: `/gyeonggi/station/suwon-station/`) | 55 |
+| 읍면동 | `/gyeonggi/{city}/({gu}/){dong}/` | 76 |
+| 정보 | `/gyeonggi/{reservation,check,privacy,support}/` | 4 |
+
+전체 218페이지. 색인(index) 137페이지, 나머지는 `noindex,follow`(아래 참고).
 
 ## 빌드
 
@@ -44,8 +50,11 @@ python3 build.py
 
 ## SEO 운영 원칙
 
-- 본문 **1,300자 미만 페이지는 자동 `noindex`** (얇은 유틸리티 페이지 보호)
-- 1차 색인: 경기 메인 + 권역 5 + 시군 31 = **37페이지**
+- 본문 **1,300자 미만 페이지는 자동 `noindex`** (얇은 페이지 보호 = 도어웨이 회피)
+- 현재 색인: 메인1 + 권역5 + 시군31 + 일반구20 + 생활권25 + 역세권55 = **137페이지**
+- **읍면동 76개는 의도적으로 `noindex,follow`로 단계 보류**: 동 계층은 페이지 수가 많고
+  서로 유사해질 위험(도어웨이)이 가장 크므로, 동별 고유 정보가 충분히 쌓일 때까지
+  색인을 보류한다. 노출은 안 되지만 크롤링·내부링크 전달은 유지된다.
 - 시군 본문은 도시별 고유 데이터(구·동·역·생활권·인접 시군)와 고유 문단으로 작성 — 지역명만 바꾼 복붙 없음
 - 메뉴명·URL에 `출장마사지` 키워드를 반복하지 않음
 - 환승역은 노선별로 쪼개지 않고 역명 기준 한 페이지
@@ -65,13 +74,20 @@ python3 build.py
 2. `python3 build.py` 재실행
 3. Google Search Console에 `sitemap.xml` 제출
 
+## 데이터·생성기 파일
+
+| 계층 | 데이터 | 생성기 |
+|---|---|---|
+| 권역·시군 | `gyeonggi_data.py` | `pages_gyeonggi.py: zone_page/city_page` |
+| 일반구 | `gyeonggi_gu_data.py` | `gu_page` |
+| 생활권 | `gyeonggi_life_data.py` | `life_page` |
+| 역세권 | `gyeonggi_station_data.py` | `station_page` |
+| 읍면동 | `gyeonggi_dong_data.py` | `dong_page` |
+| 정보 | `info_gyeonggi.py` | — |
+
 ## 2차 확장 (단계적 색인)
 
-지시서 기준 전체 230페이지 안팎 중 1차 37페이지를 우선 구축했습니다.
-GSC 노출·문의 데이터를 보고 아래를 단계적으로 추가합니다.
-
-- 일반구 페이지 (수원 4·용인 3·성남 3·고양 3·부천 3·안산 2·안양 2)
-- 핵심 읍면동 페이지 (대표동·번호동 묶음)
-- 역세권 페이지 (역명 기준 1 URL)
-- 생활권 허브 페이지 (`/gyeonggi/life/...`)
+- **읍면동 색인 승격**: 동별 고유 정보(랜드마크·도로·단지 특성)를 보강해 본문을 충분히
+  차별화한 뒤 `noindex`를 해제한다. GSC 노출·문의 데이터를 기준으로 동 단위로 승격.
 - 이용 목적별 안내 (자택·숙소·오피스텔·업무지구·외곽·추가 이동비)
+- 잔여 읍면동·역세권을 검색 수요에 맞춰 추가 (번호 동은 대표동으로 묶음)
