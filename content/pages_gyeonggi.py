@@ -371,19 +371,24 @@ def zone_page(zone):
 def city_page(c):
     zone = ZONE_BY_KEY[c["zone"]]
 
-    # 구조: 일반구가 있으면 구 → 동, 없으면 동
+    # 구조: 일반구가 있으면 시 → 구(카드) → 동, 없으면 시 → 동(칩)
     if c["gu"]:
+        struct_title = f"{c['name']} 일반구 안내"
         gu_items = GU_BY_CITY.get(c["slug"], [])
-        gu_links = " · ".join(
-            f'<a href="/gyeonggi/{c["slug"]}/{g["slug"]}/">{g["gu"]}</a>' for g in gu_items
-        ) or ", ".join(c["gu"])
+        gu_cards = _cards([
+            (g["gu"],
+             f"행정동 {len(_dongs_of_gu(c['slug'], g['slug']))}곳 · {' · '.join(g['life'][:2])} 생활권",
+             f"/gyeonggi/{c['slug']}/{g['slug']}/")
+            for g in gu_items
+        ])
         struct = (
-            f'<p><strong>{c["name"]}</strong>은(는) {", ".join(c["gu"])} 일반구로 나뉩니다. '
-            f'시 → 구 → 동 구조로 생활권을 확인하면 방문 주소를 더 정확히 정할 수 있습니다. '
-            f'각 구별 안내는 다음에서 확인하세요: {gu_links}.</p>'
-            f'<p>대표 동: {", ".join(c["dong"])}</p>'
+            f'<p><strong>{c["name"]}</strong>은(는) {", ".join(c["gu"])} <strong>{len(gu_items)}개 일반구</strong>로 나뉩니다. '
+            f'아래에서 먼저 <strong>구</strong>를 선택하면, 구 페이지에서 소속 <strong>행정동 전체</strong>를 클릭해 동별 안내로 이동할 수 있습니다. '
+            f'(행정 동선: 시 → 구 → 동)</p>'
+            f'{gu_cards}'
         )
     else:
+        struct_title = f"{c['name']} 행정동 안내"
         all_dongs = _dongs_of_city_nogu(c["slug"])
         if all_dongs:
             dong_links = " · ".join(
@@ -391,7 +396,7 @@ def city_page(c):
                 for d in all_dongs
             )
             struct = (
-                f'<p><strong>{c["name"]}</strong>은(는) 시군 → 읍면동 구조로 안내합니다. '
+                f'<p><strong>{c["name"]}</strong>은(는) 일반구(자치행정구)가 없어 <strong>시 → 읍·면·동</strong> 구조로 안내합니다. '
                 f'아래 {len(all_dongs)}개 읍·면·동을 클릭하면 동별 방문 안내로 이동합니다. '
                 f'(1·2·3동 등 번호 동은 대표 동 하나로 묶었습니다.)</p>'
                 f'<p class="dong-list">{dong_links}</p>'
@@ -443,7 +448,7 @@ def city_page(c):
 </section>
 
 <section id="structure">
-  <h2>{c['name']} 구·동 구조</h2>
+  <h2>{struct_title}</h2>
   {struct}
 </section>
 
