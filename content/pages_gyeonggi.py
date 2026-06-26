@@ -15,9 +15,21 @@ from .site import BASE_URL
 from .gyeonggi_data import ZONES, CITIES, ZONE_BY_KEY, CITY_BY_SLUG
 from .gyeonggi_gu_data import GU, GU_BY_CITY
 from .gyeonggi_life_data import LIFE
+from .gyeonggi_station_data import STATIONS
 
 # 생활권 이름 → 슬러그 (시군 페이지에서 생활권 허브로 링크)
 _LIFE_SLUG_BY_NAME = {l["name"]: l["slug"] for l in LIFE}
+# 역 이름 → 슬러그 (시군·생활권 페이지에서 역세권 허브로 링크)
+_STATION_SLUG_BY_NAME = {s["name"]: s["slug"] for s in STATIONS}
+
+
+def _station_links(names):
+    """역 이름 목록 → 역 페이지 링크(있으면) 또는 텍스트, ' · ' 연결."""
+    out = []
+    for n in names:
+        slug = _STATION_SLUG_BY_NAME.get(n)
+        out.append(f'<a href="/gyeonggi/station/{slug}/">{n}</a>' if slug else n)
+    return " · ".join(out)
 
 _BASE = BASE_URL.rstrip("/")
 
@@ -313,7 +325,7 @@ def city_page(c):
         )
 
     stations_html = (
-        f'<p>{" · ".join(c["stations"])}</p>'
+        f'<p>{_station_links(c["stations"])}</p>'
         if c["stations"]
         else '<p>이 지역은 도시철도 역세권이 제한적이라 역 기준보다 <strong>차량 이동 기준</strong>과 방문 가능 주소를 먼저 확인하는 것이 좋습니다.</p>'
     )
@@ -509,7 +521,7 @@ def life_page(l):
 
 <section id="stations">
   <h2>{l['name']} 가까운 역</h2>
-  <p>{' · '.join(l['stations'])}. 환승역도 노선별로 나누지 않고 역명 기준 한 곳으로 안내합니다.</p>
+  <p>{_station_links(l['stations'])}. 환승역도 노선별로 나누지 않고 역명 기준 한 곳으로 안내합니다.</p>
 </section>
 
 <section id="dong">
@@ -547,10 +559,104 @@ def life_page(l):
     }
 
 
+# ── 역세권(station) 페이지 ──────────────────────────────────
+_SDTPL = [
+    "{a}은(는) {name} 이용권에 속하는 지역입니다. 자택·숙소·오피스텔 등 방문 장소 유형을 알려주시면 빠르게 안내해 드립니다.",
+    "{a} 일대는 {name}을(를) 끼고 있어, 단지·건물명과 출입 방식을 확인하면 방문 일정을 정확히 잡을 수 있습니다.",
+    "{a} 쪽은 {name} 기준으로 이동권이 형성됩니다. 경계 지역이라면 인접 역·생활권 기준이 적용될 수 있으니 도로명 주소를 알려주세요.",
+]
+
+
+def station_page(s):
+    city = CITY_BY_SLUG[s["city"]]
+    zone = ZONE_BY_KEY[city["zone"]]
+
+    area_html = "".join(
+        f"<dt>{a}</dt><dd>{_SDTPL[i % len(_SDTPL)].format(a=a, name=s['name'])} "
+        f"{_SDTPL[(i + 1) % len(_SDTPL)].format(a=a, name=s['name'])}</dd>"
+        for i, a in enumerate(s["areas"])
+    )
+
+    # 노선·환승 안내 (역마다 노선 구성이 달라 고유)
+    if len(s["lines"]) > 1:
+        line_note = (
+            f"{s['name']}은 {' · '.join(s['lines'])}이(가) 만나는 환승역입니다. "
+            f"환승 거점이라 유동 인구가 많지만, 노선별·출구별로 페이지를 나누지 않고 "
+            f"{s['name']} 한 곳을 기준으로 인근 생활권을 안내합니다. 환승 동선과 가까운 출구 정보를 "
+            f"함께 알려주시면 방문 위치를 더 빠르게 확인할 수 있습니다."
+        )
+    else:
+        line_note = (
+            f"{s['name']}은 {s['lines'][0]}이(가) 지나는 역입니다. 단일 노선 역세권으로 "
+            f"역 주변 생활권이 비교적 명확하므로, 방문 주소가 역과 도보권인지 차량 이동권인지 "
+            f"확인하면 기본 이동권 범위를 정확히 안내해 드릴 수 있습니다."
+        )
+
+    # 같은 시의 생활권·다른 역 내부링크
+    city_life = [l for l in LIFE if l["city"] == s["city"]]
+    life_links = _li_links([(l["name"], f"/gyeonggi/life/{l['slug']}/") for l in city_life])
+    sib_st = [x for x in STATIONS if x["city"] == s["city"] and x["slug"] != s["slug"]]
+    sib_links = _li_links([(x["name"], f"/gyeonggi/station/{x['slug']}/") for x in sib_st])
+
+    faq = [
+        (f"{s['name']}은 무슨 노선인가요?",
+         f"{s['name']}은 {' · '.join(s['lines'])} 노선이 지나는 역입니다. 환승역이라도 노선별로 나누지 않고 역명 기준 한 페이지로 안내합니다."),
+        (f"{s['name']} 인근 어디까지 방문이 가능한가요?",
+         f"{' · '.join(s['areas'])} 등 {s['name']} 인근 생활권으로 방문 가능합니다. 정확한 방문 주소와 건물 출입 방식을 알려주시면 예약이 수월합니다."),
+    ]
+
+    body = f"""
+<section id="overview">
+  <h2>{s['name']} 역세권 안내</h2>
+  <p>{s['focus']}</p>
+  <p>{s['name']}은 <a href="/gyeonggi/{s['city']}/">{s['city_name']}</a>에 위치한 역으로, {' · '.join(s['lines'])} 노선이 지납니다. {s['city_name']}은(는) <a href="/gyeonggi/zone/{zone['key']}/">{zone['name']}</a> 권역이며, 환승역도 출구별·노선별로 나누지 않고 역명 기준 한 곳으로 안내합니다.</p>
+</section>
+
+<section id="lines">
+  <h2>{s['name']} 노선·환승 안내</h2>
+  <p>{line_note}</p>
+</section>
+
+<section id="nearby">
+  <h2>{s['name']} 인접 동·생활권</h2>
+  <p>{s['name']} 인근에서도 동에 따라 이동권이 조금씩 다릅니다. 방문 주소가 어느 동인지 확인하면 안내가 정확합니다.</p>
+  <dl class="faq-list">{area_html}</dl>
+</section>
+
+<section id="guide">
+  <h2>{s['name']} 이용·예약 기준</h2>
+  <p>{s['name']} 인근은 {s['city_name']} 안에서도 다른 권역과 이동 기준이 구분됩니다. 역과 도보권이면 기본 이동권 범위에서 안내되고, 차량 이동이 필요한 거리라면 추가 이동비 발생 여부를 정확한 주소 확인 후 안내해 드립니다. 자택·숙소·오피스텔 등 방문 장소 유형과 예약 가능 시간을 함께 알려주시면 방문 일정을 빠르게 확정할 수 있습니다. 예약 방법은 <a href="/gyeonggi/reservation/">예약 안내</a>, 확인사항은 <a href="/gyeonggi/check/">이용 전 확인사항</a>에서 확인하세요.</p>
+</section>
+
+<section id="related">
+  <h2>{s['city_name']} 연결 생활권·역</h2>
+  <p>{s['name']}과(와) 이어지는 {s['city_name']} 생활권 및 인근 역 안내입니다.</p>
+  <ul>{life_links}{sib_links}</ul>
+</section>
+{_CHECK_BLOCK}
+<section id="faq">
+  <h2>{s['name']} 자주 묻는 질문</h2>
+  <dl class="faq-list">{''.join(f'<dt>{q}</dt><dd>{a}</dd>' for q, a in faq)}</dl>
+</section>
+"""
+    return {
+        "path": f"gyeonggi/station/{s['slug']}/",
+        "title": f"{s['name']} 출장마사지·홈타이 역세권 안내",
+        "desc": f"{s['name']} 출장마사지·홈타이 — {s['city_name']} {' · '.join(s['areas'][:2])} 인근 생활권 안내.",
+        "h1": f"{s['name']} 출장마사지 · 역세권 예약 안내",
+        "breadcrumb": [("경기", "/gyeonggi/"),
+                        (s["city_name"], f"/gyeonggi/{s['city']}/"),
+                        (s["name"], "")],
+        "extra_head": _faq_schema(faq),
+        "body": body,
+    }
+
+
 def all_pages():
     pages = [root_redirect_page(), main_page()]
     pages += [zone_page(z) for z in ZONES]
     pages += [city_page(c) for c in CITIES]
     pages += [gu_page(g) for g in GU]
     pages += [life_page(l) for l in LIFE]
+    pages += [station_page(s) for s in STATIONS]
     return pages
